@@ -16,6 +16,7 @@ const CHAIN_ID = {
 // https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/IRealitio.sol
 
 
+
 const {
   ETH_RPC_URL,
   ETH_ACCOUNT_PRIVKEY,
@@ -234,6 +235,7 @@ async function main() {
   // LMSRMarketMakerFactory
   const lsmrMarketMakerFactoryAddress = "0x03Ce050DAEB28021086Bf8e9B7843d6212c05F7B"
   const lsmrMarketMakerFactory = new ethers.Contract(lsmrMarketMakerFactoryAddress, marketMakerAbi, signer)
+
 
   const collateralTokenAddress = '0xc778417e063141139fce010982780140aa0cd5ab'
   const collateralToken = new ethers.Contract(collateralTokenAddress, wethAbi, signer)

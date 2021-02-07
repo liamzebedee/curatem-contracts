@@ -1,0 +1,25 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "questionId",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "outcomeSlotCount",
+        "type": "uint256"
+      }
+    ],
+    "name": "prepareCondition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

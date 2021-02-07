@@ -1,0 +1,82 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_realitio",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_conditionalTokens",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_REALITYIO_GNOSIS_PROXY_ADDRESS",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_FPMMDeterministicFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_WETH9",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "community",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "hashDigest",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "conditionId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "questionId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "MarketCreated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "communityId",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "hashDigest",
+        "type": "bytes32"
+      }
+    ],
+    "name": "createMarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

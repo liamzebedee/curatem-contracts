@@ -1,0 +1,22 @@
+{
+    "31337": {
+        "Curatem": {
+            "address": "0x63fea6E447F120B8Faf85B53cdaD8348e645D80E",
+            "hash": "0x7d7851f2085c18514d77523e8932abc2655c46833851b72ea090a3db22b30ac0",
+            "blockHash": "0x27da1790a8b7d2e1c6e516949e0933df1e387a6ee9cf8412deee88f80fd3811d",
+            "blockNumber": 195
+        },
+        "ModeratorArbitrator": {
+            "address": "0x9BcC604D4381C5b0Ad12Ff3Bf32bEdE063416BC7",
+            "hash": "0x65b9a5c315517f1f93750e713405fa17892c34fc1e8dfeefc62ea07e6abca147",
+            "blockHash": "0x40ba29ac826e3192b415639cf13e60b491b8ad3636105a2206169083480a60c8",
+            "blockNumber": 194
+        },
+        "RedditCommunity1": {
+            "address": "0xdFdE6B33f13de2CA1A75A6F7169f50541B14f75b",
+            "hash": "0x2dedacebe482a80478bf4bf4961072995cf4c6d8198adc5f5e847b7126cfda66",
+            "blockHash": "0x52c0c2d2ea007d4d5d376dbb1c005656c94f85fd697d776330036a5a9b557ab8",
+            "blockNumber": 196
+        }
+    }
+}

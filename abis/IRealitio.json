@@ -1,0 +1,48 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "question_id",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "requester",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "max_previous",
+        "type": "uint256"
+      }
+    ],
+    "name": "notifyOfArbitrationRequest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "question_id",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "answer",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "answerer",
+        "type": "address"
+      }
+    ],
+    "name": "submitAnswerByArbitrator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

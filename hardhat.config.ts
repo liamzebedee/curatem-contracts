@@ -1,5 +1,7 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
+import 'hardhat-abi-exporter'
+
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -23,6 +25,9 @@ export default {
   networks: {
     hardhat: {
     },
+    development: {
+      url: "http://localhost:8545",
+    },
     rinkeby: {
       url: process.env.ETH_RPC_URL,
       accounts: [process.env.ETH_ACCOUNT_PRIVKEY]
@@ -34,6 +39,11 @@ export default {
     cache: "./cache",
     artifacts: "./artifacts"
   },
+  abiExporter: {
+    path: './abis',
+    clear: true,
+    flat: true
+  },  
   mocha: {
     timeout: 20000
   }
