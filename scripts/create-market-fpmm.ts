@@ -228,9 +228,8 @@ async function main() {
   let resolver = new DeploymentsJsonResolver(networkId, '../deployments.json')
   
   // Create the market metadata JSON.
-  const communityId = resolver.resolve('RedditCommunity1').address
   const marketMetadata = {
-    url: "https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/",
+    url: `https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/${+new Date}`,
     type: 'post'
   }
 
@@ -253,12 +252,13 @@ async function main() {
 
 
   // Get the subreddit community.
-  
+  const communityAddress = resolver.resolve('RedditCommunity1').address
+  const curatem = await hre.ethers.getContractAt('CuratemCommunity', communityAddress)
+  await curatem.createMarket(marketMetadata.url)
 
-  const curatem = await hre.ethers.getContractAt('Curatem', resolver.resolve('Curatem').address)
-  
-  await curatem.createMarket(communityId, cid.multihash.slice(2))
+  await curatem.createMarket(`https://www.reddit.com/r/CryptoCurrency/comments/lexo3f/latest_week_in_eth_news/`)
   console.info(`Created market on Curatem`)
+  // cid.multihash.slice(2)
   return
 
 

@@ -8,6 +8,12 @@ $ eval .env
 $ yarn hardhat run scripts/sample-script.ts
 ```
 
+## Testing.
+
+```sh
+# Create a market.
+yarn hardhat run scripts/create-market-fpmm.ts
+```
 
 ## Design.
 

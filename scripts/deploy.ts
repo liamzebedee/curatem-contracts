@@ -9,7 +9,7 @@ const {
 import { writeFileSync } from 'fs'
 import { join } from 'path'
 import { resolveContracts } from './resolver'
-import { Contract } from 'ethers'
+import { utils, Contract, ethers } from 'ethers'
 
 const DEPLOYMENTS_PATH = join(__dirname, '../deployments.json')
 
@@ -44,9 +44,12 @@ async function main() {
     const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
     
 
-
-    // 1. Deploy the Curatem contract.
-    const Curatem = await hre.ethers.getContractFactory("Curatem");
+    // 1. Deploy Resolver.
+    // const AddressResolver = await hre.ethers.getContractFactory("AddressResolver");
+    // const addressResolver = await AddressResolver.deploy()
+    // contracts['AddressResolver'] = addressResolver
+    
+    // // 1a. Import vendor addresses.
     const {
       Realitio,
       RealitioProxy,
@@ -55,13 +58,32 @@ async function main() {
       WETH9
     } = vendoredContracts
 
+    // const names = [
+    //   'Realitio',
+    //   'RealitioProxy',
+    //   'ConditionalTokens',
+    //   'FPMMDeterministicFactory',
+    //   'WETH9'
+    // ]
+    // const destinations = [
+    //   Realitio,
+    //   RealitioProxy,
+    //   ConditionalTokens,
+    //   FPMMDeterministicFactory,
+    //   WETH9
+    // ]
+    // await addressResolver.importAddresses(names, destinations)
 
+
+
+    // 1. Deploy the Curatem contract.
+    const Curatem = await hre.ethers.getContractFactory("Curatem");
+    
     const curatem = await Curatem.deploy(
       Realitio,
-      ConditionalTokens,
       RealitioProxy,
-      FPMMDeterministicFactory,
-      WETH9
+      ConditionalTokens,
+      FPMMDeterministicFactory
     )
     contracts['Curatem'] = curatem
     
@@ -76,8 +98,19 @@ async function main() {
     
     const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
     for(let community of communities) {
-      const instance = await CuratemCommunity.deploy(community.token, community.moderator)
-      contracts[community.id] = instance
+      const salt = ethers.BigNumber.from(ethers.utils.randomBytes(32))
+      const txResponse = await curatem.createCommunity(
+        salt,
+        community.token, 
+        community.moderator
+      )
+      const receipt = await txResponse.wait()
+      const event = receipt.events.find(log => log.event === 'NewCommunity');
+      
+      contracts[community.id] = {
+        deployTransaction: txResponse,
+        address: event.args.community
+      } as Contract // TODO: hack
     }
     
     

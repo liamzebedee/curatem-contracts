@@ -1,5 +1,9 @@
 {
-  "name": "hardhat-project",
+  "name": "@curatem/contracts",
+  "version": "0.0.1",
+  "scripts": {
+    "deploy": "yarn hardhat run scripts/deploy.ts"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
