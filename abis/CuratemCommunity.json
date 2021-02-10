@@ -55,6 +55,12 @@
         "internalType": "bytes32",
         "name": "questionId",
         "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "fixedProductMarketMaker",
+        "type": "address"
       }
     ],
     "name": "MarketCreated",

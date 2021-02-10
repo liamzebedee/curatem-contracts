@@ -21,6 +21,7 @@
   "dependencies": {
     "@gnosis.pm/conditional-tokens-contracts": "^1.0.3",
     "@gnosis.pm/conditional-tokens-market-makers": "^1.8.1",
+    "@openzeppelin/contracts": "^3.4.0",
     "@realitio/realitio-lib": "^2.0.2",
     "hardhat-abi-exporter": "^2.0.8",
     "ipfs-core": "^0.5.1"
