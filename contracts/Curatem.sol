@@ -100,33 +100,36 @@ contract CuratemCommunity {
         });
 
         // Calculate the questionId
-        bytes32 content_hash = keccak256(abi.encodePacked(
-            questionId_vars.template_id, 
-            questionId_vars.opening_ts, 
-            questionId_vars.question));
-        bytes32 questionId = keccak256(abi.encodePacked(
-            content_hash, 
-            questionId_vars.arbitrator, 
-            questionId_vars.timeout, 
-            msg.sender, 
-            questionId_vars.nonce));
-        bytes32 conditionId = keccak256(abi.encodePacked(
-            realityIoGnosisProxy, 
-            questionId, 
-            questionId_vars.outcomeSlotCount));
+        // bytes32 content_hash = keccak256(abi.encodePacked(
+        //     questionId_vars.template_id, 
+        //     questionId_vars.opening_ts, 
+        //     questionId_vars.question));
+        // bytes32 questionId = keccak256(abi.encodePacked(
+        //     content_hash, 
+        //     questionId_vars.arbitrator, 
+        //     questionId_vars.timeout, 
+        //     address(this), 
+        //     questionId_vars.nonce));
 
         // Create the market for the post ID.
-        realitio.askQuestion(
+        bytes32 questionId = realitio.askQuestion(
             questionId_vars.template_id, 
             questionId_vars.question, 
             questionId_vars.arbitrator, 
             questionId_vars.timeout, 
             questionId_vars.opening_ts, 
             questionId_vars.nonce);
+
+        bytes32 conditionId = keccak256(abi.encodePacked(
+            realityIoGnosisProxy, 
+            questionId, 
+            questionId_vars.outcomeSlotCount));
+
         
         conditionalTokens.prepareCondition(
             realityIoGnosisProxy, // oracle
-            questionId, questionId_vars.outcomeSlotCount);
+            questionId, 
+            questionId_vars.outcomeSlotCount);
 
 
         uint[] memory distributionHint;
