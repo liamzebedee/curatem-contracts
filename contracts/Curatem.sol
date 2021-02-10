@@ -38,7 +38,7 @@ contract CuratemCommunity {
     address realityIoGnosisProxy;
 
     uint32 constant timeoutResolution = 5 minutes;
-    string constant REALITIO_UNICODE_SEPERATOR = "\uE2909F";
+    string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
     // string constant REALITIO_UNICODE_SEPERATOR = string(0xE2909F);
 
     /* ========== ADDRESS RESOLVER CONFIGURATION ========== */
