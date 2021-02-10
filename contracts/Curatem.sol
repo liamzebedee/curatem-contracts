@@ -30,7 +30,7 @@ contract CuratemCommunity {
     address public moderator;
     mapping(bytes32 => string) public itemUrlForDigest;
 
-    event MarketCreated(bytes32 hashDigest, bytes32 conditionId, bytes32 questionId);
+    event MarketCreated(bytes32 hashDigest, bytes32 conditionId, bytes32 questionId, address fixedProductMarketMaker);
 
     Realitio realitio;
     ConditionalTokens conditionalTokens;
@@ -136,7 +136,7 @@ contract CuratemCommunity {
         bytes32[] memory conditionIds = new bytes32[](1);
         conditionIds[0] = conditionId;
 
-        fpmmFactory.create2FixedProductMarketMaker(
+        address fixedProductMarketMaker = fpmmFactory.create2FixedProductMarketMaker(
             questionId_vars.nonce, // saltNonce, 
             address(conditionalTokens), 
             token, // collateralAddress, 
@@ -146,7 +146,7 @@ contract CuratemCommunity {
             distributionHint
         );
 
-        emit MarketCreated(hashDigest, conditionId, questionId);
+        emit MarketCreated(hashDigest, conditionId, questionId, fixedProductMarketMaker);
     }
 
     function getUrl(bytes32 digest) public view returns (string memory) {
