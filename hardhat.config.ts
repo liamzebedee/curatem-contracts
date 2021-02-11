@@ -20,7 +20,26 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 export default {
-  solidity: "0.7.3",
+  solidity: {
+    compilers: [
+      {
+        version: "0.5.5"
+      },
+      {
+        version: "0.6.2"
+      },
+      {
+        version: "0.7.0",
+        settings: { } 
+      }
+    ],
+    // overrides: {
+    //   "contracts/CuratemCommunity.sol": {
+    //     version: "0.5.5",
+    //     settings: { }
+    //   }
+    // }
+  },
   defaultNetwork: "development",
   networks: {
     hardhat: {
