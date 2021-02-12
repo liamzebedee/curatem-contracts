@@ -3,21 +3,21 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "oracle",
+        "name": "_market",
         "type": "address"
       },
       {
-        "internalType": "bytes32",
-        "name": "questionId",
-        "type": "bytes32"
+        "internalType": "uint256",
+        "name": "buyAmount",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "outcomeSlotCount",
+        "name": "liquidityAmount",
         "type": "uint256"
       }
     ],
-    "name": "prepareCondition",
+    "name": "buyAndCreatePool",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

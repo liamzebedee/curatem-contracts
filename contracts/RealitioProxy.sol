@@ -1,6 +1,6 @@
 
 
-import "./interfaces/Realitio.sol";
+import "./interfaces/IRealitio.sol";
 import "./interfaces/IPredictionMarket.sol";
 
 

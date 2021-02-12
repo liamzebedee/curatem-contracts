@@ -54,6 +54,16 @@
         "internalType": "address",
         "name": "_moderator",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_bFactory",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_factory",
+        "type": "address"
       }
     ],
     "name": "createCommunity",

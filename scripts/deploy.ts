@@ -19,10 +19,10 @@ async function main() {
   let provider = hre.ethers.provider
 
   const vendoredContracts = await resolveContracts(provider)
-    let deployments = require(DEPLOYMENTS_PATH)
-    let contracts: {
-      [key: string]: Contract
-    } = {}
+  let deployments = require(DEPLOYMENTS_PATH)
+  let contracts: {
+    [key: string]: Contract
+  } = {}
     
     // Hardhat always runs the compile task when running scripts with its command
     // line interface.
@@ -55,8 +55,15 @@ async function main() {
       RealitioProxy,
       ConditionalTokens,
       FPMMDeterministicFactory,
-      WETH9
+      WETH9,
+      BFactory
     } = vendoredContracts
+
+    console.log(`Vendored addresses:`)
+    Object.entries(vendoredContracts).map(([name, address]) => {
+      console.log(`${name},${address}`)
+    })
+    console.log()
 
     // const names = [
     //   'Realitio',
@@ -75,9 +82,43 @@ async function main() {
     // await addressResolver.importAddresses(names, destinations)
 
 
+    // 1a. Deploy libraries.
+    const CTHelpers = await hre.ethers.getContractFactory("CTHelpers");
+    const ctHelpers = await CTHelpers.deploy()
+
+    const Scripts = await hre.ethers.getContractFactory("Scripts");
+    const scripts = await Scripts.deploy()
+    contracts['Scripts'] = scripts
+    
+    // const LibFactory = await hre.ethers.getContractFactory("LibFactory");
+    // const libfactory = await LibFactory.deploy()
+    // contracts['LibFactory'] = libfactory
+
+    const libraries = {
+      "CTHelpers": ctHelpers.address,
+    }
+
+    // Deploy the factories.
+    const Factory = await hre.ethers.getContractFactory(
+      "Factory",
+      {
+        libraries: {
+        },
+      }
+    );
+    const factory = await Factory.deploy()
+    await factory.initialize()
+    contracts['Factory'] = factory
+
+
 
     // 1. Deploy the Curatem contract.
-    const Curatem = await hre.ethers.getContractFactory("Curatem");
+    const Curatem = await hre.ethers.getContractFactory(
+      "Curatem",
+      {
+        libraries,
+      }
+    );
     
     const curatem = await Curatem.deploy(
       Realitio,
@@ -87,6 +128,7 @@ async function main() {
     )
     contracts['Curatem'] = curatem
     
+
     // 2. Deploy an example community.
     const communities = [
       {
@@ -96,13 +138,20 @@ async function main() {
       }
     ]
     
-    const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
+    const CuratemCommunity = await hre.ethers.getContractFactory(
+      "CuratemCommunity",
+      {
+        libraries,
+      }
+    )
     for(let community of communities) {
       const salt = ethers.BigNumber.from(ethers.utils.randomBytes(32))
       const txResponse = await curatem.createCommunity(
         salt,
         community.token, 
-        community.moderator
+        community.moderator,
+        BFactory,
+        factory.address
       )
       const receipt = await txResponse.wait()
       const event = receipt.events.find(log => log.event === 'NewCommunity');

@@ -1,7 +1,6 @@
-pragma solidity ^0.7.0;
+// pragma solidity ^0.5.5;
 
-// import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-// import "./vendor/CTHelpers.sol";
+
 import "./CuratemCommunity.sol";
 
 
@@ -11,7 +10,6 @@ contract Curatem {
     address fpmmFactory;
     address realityIoGnosisProxy;
     address weth9;
-    address bFactory;
 
     event NewCommunity(address community);
 
@@ -19,8 +17,7 @@ contract Curatem {
         address _realitio,
         address _realityIoGnosisProxy,
         address _conditionalTokens,
-        address _fpmmFactory,
-        address _bFactory
+        address _fpmmFactory
     ) 
         public 
     {
@@ -28,20 +25,23 @@ contract Curatem {
         realityIoGnosisProxy = _realityIoGnosisProxy;
         conditionalTokens = _conditionalTokens;
         fpmmFactory = _fpmmFactory;
-        bFactory = _bFactory;
     }
 
     function createCommunity(
         bytes32 salt,
         address _token,
-        address _moderator
+        address _moderator,
+        address _bFactory,
+        address _factory
     ) public returns (address) {
-        CuratemCommunity community = new CuratemCommunity{ salt: salt }(
+        // { salt: salt }
+        CuratemCommunity community = new CuratemCommunity(
             realitio,
             realityIoGnosisProxy,
             conditionalTokens,
             fpmmFactory,
-            bFactory,
+            _bFactory,
+            _factory,
             _token, 
             msg.sender
         );

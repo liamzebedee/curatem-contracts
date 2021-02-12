@@ -1,22 +1,40 @@
 {
     "31337": {
         "Curatem": {
-            "address": "0x276C216D241856199A83bf27b2286659e5b877D3",
-            "hash": "0x8de1471dbc087ade7c3ed10c28252afd3de6498193950fefac1f95ce63f9e34f",
-            "blockHash": "0x33fa1307aa45e68f20fd81349b9ac90f0a264ed6aeceb7a1c63d5d9e8f732cdd",
-            "blockNumber": 116
+            "address": "0x2B64822cf4bbDd77d386F51AA2B40c5cdbeb80b5",
+            "hash": "0x8ca30b9066c497fa76f56b27ca98063ca7ee6c23d12337b0f2c13e2ac9cd685b",
+            "blockHash": "0x85044355649d2f00fe6d1ac6369c3e07303d168bbd50870dff7cb165955ccd99",
+            "blockNumber": 759
         },
         "ModeratorArbitrator": {
-            "address": "0xfaAddC93baf78e89DCf37bA67943E1bE8F37Bb8c",
-            "hash": "0x6730f1721112de32e11afc380c536a6e75dbce363f3fe9619bf5c68add3ead2a",
-            "blockHash": "0x0c874e46135c5291957516129f746ea38bcfb9946e47543fadf1de472f037250",
-            "blockNumber": 115
+            "address": "0x8786A226918A4c6Cd7B3463ca200f156C964031f",
+            "hash": "0x57a9a58a1a702da3cb49c1227cb524c47c173b22f3a2b86deeb9b7c05052f42e",
+            "blockHash": "0xcbbcf405ec46bba8cccaa562c9d557ddc8c24635b48c10f21e887334b91a669d",
+            "blockNumber": 754
         },
         "RedditCommunity1": {
-            "address": "0x11D649002fA41CbDF74Ad8D6bC8c5473Aa0C66db",
-            "hash": "0xc59a0810aa892bf447f508998a817785357954f60a9cadb5c3a575be82ab5aae",
-            "blockHash": "0x9b7c471709fb5c21ce4743006441f049fc2bb1274c7e3f2bb4cce8077c2db56a",
-            "blockNumber": 117
+            "address": "0xa2e83E07fad2e7a413dE297580d35b991962dEbC",
+            "hash": "0xb4cae7ba5bd0c3ff1d176ce4bab2a26450b1c85252444cde35898391ef000302",
+            "blockHash": "0x8baaf6d032778c8012d7679b6035edc3c9090807e39df0309bd9e01c5542bca8",
+            "blockNumber": 760
+        },
+        "Scripts": {
+            "address": "0x72aC6A36de2f72BD39e9c782e9db0DCc41FEbfe2",
+            "hash": "0x439bca7b9c989f3077c2aa96b58af843f3abd1cdd408b34cc44e2dbb624c9984",
+            "blockHash": "0x3bf993a02a765472bad041a6add4881a435ae60d668eeebef32020fad65eb342",
+            "blockNumber": 756
+        },
+        "LibFactory": {
+            "address": "0x90E75f390332356426B60FB440DF23f860F6A113",
+            "hash": "0xb8aa3ef1a84b0c4d7c8ed5bd4126edc7ccc94797e69daa4ebd18f8cd08dcf09f",
+            "blockHash": "0x2d6eec4093583d298020ab4240ff8ce71ac1d79d8a3be207ab6e2a02952aa7eb",
+            "blockNumber": 651
+        },
+        "Factory": {
+            "address": "0xAAd4F7BB5FB661181D500829e60010043833a85B",
+            "hash": "0x177c17192cf0d07ffa382a28db6cf11bf33794a26315cbc6a0ee91ce1d929bf6",
+            "blockHash": "0xe44fcc242d3987080e9e84c992f16874d5ebeff3def446db6a1e45150baa5c95",
+            "blockNumber": 757
         }
     }
 }

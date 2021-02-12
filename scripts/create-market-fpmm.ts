@@ -175,6 +175,12 @@ async function resolveContracts(provider: ethers.providers.Provider): Promise<Co
     }, {})
 }
 
+const IFixedProductMarketMakerJSON = require('../abis/IFixedProductMarketMaker.json')
+
+function toWei(amount: string) {
+  return ethers.utils.parseUnits(amount, 'ether')
+}
+
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -202,7 +208,7 @@ async function main() {
     RealitioProxy: REALITYIO_GNOSIS_PROXY_ADDRESS,
     ConditionalTokens: CONDITIONAL_TOKENS_ADDRESS,
     FPMMDeterministicFactory: FP_MARKET_MAKER_FACTORY_ADDRESS,
-    WETH9: COLLATERAL_TOKEN_ADDRESS,
+    WETH9,
     RedditCommunity1: RedditCommunity1
   } = await resolveContracts(provider)
   
@@ -244,113 +250,208 @@ async function main() {
   //   }
   // })
   // TODO: `as any` is a workaround.
-  const ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001' as any)
-  const { cid } = await ipfs.add(JSON.stringify(marketMetadata), {
-    pin: true,
-  })
-  console.info(`Market metadata uploaded to IPFS - ipfs:${cid}`)
+  // const ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001' as any)
+  // const { cid } = await ipfs.add(JSON.stringify(marketMetadata), {
+  //   pin: true,
+  // })
+  // console.info(`Market metadata uploaded to IPFS - ipfs:${cid}`)
 
 
   // Get the subreddit community.
   const communityAddress = resolver.resolve('RedditCommunity1').address
-  const curatem = await hre.ethers.getContractAt('CuratemCommunity', communityAddress)
-  await curatem.createMarket(marketMetadata.url)
-
-  await curatem.createMarket(`https://www.reddit.com/r/CryptoCurrency/comments/lexo3f/latest_week_in_eth_news/`)
+  const community = await hre.ethers.getContractAt('CuratemCommunity', communityAddress)
+  const createMarketTx = await community.createMarket(marketMetadata.url)
   console.info(`Created market on Curatem`)
+
+
+
+  // -----------
+  // SpamPredictionMarket
+  // -----------
+
+
+  const receipt = await createMarketTx.wait()
+  const { hashDigest, questionId, market } = receipt.events.filter(event => event.event == 'NewSpamPredictionMarket')[0].args
+
+  const scripts = await hre.ethers.getContractAt("Scripts", resolver.resolve('Scripts').address)
+  const predictionMarket = await hre.ethers.getContractAt("SpamPredictionMarket", market)
+  
+  const weth = await hre.ethers.getContractAt('WETH9', WETH9)
+  await weth.approve(scripts.address, ethers.constants.MaxUint256)
+  await weth.deposit({ 
+    value: toWei('5')
+  })
+
+  await scripts.buyAndCreatePool(market, toWei('2'), toWei('2'))
+  
+  {
+    const tokenAddress = (await predictionMarket.spamToken())
+    console.log(
+      tokenAddress
+    )
+    const token = await hre.ethers.getContractAt("OutcomeToken", tokenAddress)
+    console.log(
+      await token.balanceOf(await signer.getAddress())
+    )
+
+    const poolAddress = (await predictionMarket.pool())
+    console.log(poolAddress)
+    const poolToken = new ethers.Contract(poolAddress, erc20Abi, signer)
+    console.log(
+      await poolToken.balanceOf(await signer.getAddress())
+    )
+  }
+  // await predictionMarket.buyAndCreatePool(toWei('2'))
+
+
+  // -----------
+  // Gnosis
+  // -----------
+  
+  // Now buy some outcome tokens in that market.
+  // const receipt = await createMarketTx.wait()
+  // const { fixedProductMarketMaker, conditionId } = receipt.events.filter(event => event.event == 'MarketCreated')[0].args
+
+  // const fpmm = new ethers.Contract(fixedProductMarketMaker, IFixedProductMarketMakerJSON, provider).connect(signer)
+  // const weth = await hre.ethers.getContractAt('WETH9', WETH9)
+  // await weth.approve(fpmm.address, ethers.constants.MaxUint256)
+  // await weth.deposit({ 
+  //   value: toWei('5')
+  // })
+
+
+  // const conditionalTokens = await hre.ethers.getContractAt('IConditionalTokens', CONDITIONAL_TOKENS_ADDRESS)
+  // console.log(conditionalTokens.filters.TransferBatch)
+  // const transfers = await conditionalTokens.queryFilter(conditionalTokens.filters.TransferBatch())
+  // console.log(transfers[transfers.length - 1].args)
+
+  // const addFundingTx = await fpmm.addFunding(toWei('1'), [50,50])
+  // // console.log(
+  // //   (await addFundingTx.wait()).events
+  // // )
+
+
+  // for(let i = 0; i < 2; i++) {
+  //   // const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
+  //   const collectionId = await conditionalTokens.getCollectionId(ethers.constants.HashZero, conditionId, 1 << i)
+  //   const positionIdForCollectionId = await conditionalTokens.getPositionId(WETH9, collectionId)
+  //   console.log(
+  //     `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
+  //   )
+  //   console.log(`Position ID: ${ethers.BigNumber.from(positionIdForCollectionId).toHexString()}`)
+  // }
+
+  // const spamTokenAddress = await community.spamToken(conditionId)
+  // const notSpamTokenAddress = await community.notSpamToken(conditionId)
+  
+  // console.log(
+  //   spamTokenAddress,
+  //   '\n',
+  //   notSpamTokenAddress
+  // )
+  // await new Promise((res) => setTimeout((x) => res(null), 1000))
+  
+  // console.log(
+  //   (await conditionalTokens.balanceOf(await signer.getAddress(), spamTokenAddress)).toNumber(),
+  //   (await conditionalTokens.balanceOf('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266', notSpamTokenAddress)).toNumber()
+  // )
+
+  
+
+
   // cid.multihash.slice(2)
   return
 
 
-  const realityio = new ethers.Contract(REALITYIO_ADDRESS, realitioAbi, signer)
-  const realitioConstantContract = new ethers.Contract(REALITYIO_ADDRESS, realitioCallAbi, signer)
+  // const realityio = new ethers.Contract(REALITYIO_ADDRESS, realitioAbi, signer)
+  // const realitioConstantContract = new ethers.Contract(REALITYIO_ADDRESS, realitioCallAbi, signer)
   
-  // uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce
-  // https://reality.eth.link/app/docs/html/contracts.html#single-select
-  const TEMPLATE_SINGLE_SELECT = 2
-  const questionText = `Is this spam? ${marketMetadata.url}`
-  const outcomes = ['Spam','Not spam']
-  const question = RealitioQuestionLib.encodeText('single-select', questionText, outcomes, 'Spam Classification')
-  console.log(question)
+  // // uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce
+  // // https://reality.eth.link/app/docs/html/contracts.html#single-select
+  // const TEMPLATE_SINGLE_SELECT = 2
+  // const questionText = `Is this spam? ${marketMetadata.url}`
+  // const outcomes = ['Spam','Not spam']
+  // const question = RealitioQuestionLib.encodeText('single-select', questionText, outcomes, 'Spam Classification')
+  // console.log(question)
 
-  const arbitrator = MODERATOR_MULTISIG_ADDRESS
-  // TODO: adjust for network.
-  const timeoutResolution = 180
-  const TRADING_PERIOD = 5 * 60 // 5mins
+  // const arbitrator = MODERATOR_MULTISIG_ADDRESS
+  // // TODO: adjust for network.
+  // const timeoutResolution = 180
+  // const TRADING_PERIOD = 5 * 60 // 5mins
 
-  const openingTimestamp = TRADING_PERIOD + Math.floor((new Date).getTime() / 1000)
-  const nonce = ethers.BigNumber.from(ethers.utils.randomBytes(32));
+  // const openingTimestamp = TRADING_PERIOD + Math.floor((new Date).getTime() / 1000)
+  // const nonce = ethers.BigNumber.from(ethers.utils.randomBytes(32));
   
-  let args = [
-    TEMPLATE_SINGLE_SELECT,
-    question,
-    arbitrator,
-    timeoutResolution,
-    openingTimestamp,
-    nonce
-  ]
-  const questionId = await realitioConstantContract.askQuestion(...args) 
-  let res = await realityio.askQuestion(...args)
-  console.log(`https://rinkeby.etherscan.io/tx/${res.hash}`)
-  console.log(`https://reality.eth.link/app/#!/question/${questionId}`)
-  // const questionId = '0x0000000000000000000000000000000000000000000000000000000000000000'
+  // let args = [
+  //   TEMPLATE_SINGLE_SELECT,
+  //   question,
+  //   arbitrator,
+  //   timeoutResolution,
+  //   openingTimestamp,
+  //   nonce
+  // ]
+  // const questionId = await realitioConstantContract.askQuestion(...args) 
+  // let res = await realityio.askQuestion(...args)
+  // console.log(`https://rinkeby.etherscan.io/tx/${res.hash}`)
+  // console.log(`https://reality.eth.link/app/#!/question/${questionId}`)
+  // // const questionId = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 
-  const oracleAddress = REALITYIO_GNOSIS_PROXY_ADDRESS
-  const conditionalTokens = new ethers.Contract(CONDITIONAL_TOKENS_ADDRESS, conditionalTokensAbi, signer)
-  const outcomeSlotCount = 2
+  // const oracleAddress = REALITYIO_GNOSIS_PROXY_ADDRESS
+  // const conditionalTokens = new ethers.Contract(CONDITIONAL_TOKENS_ADDRESS, conditionalTokensAbi, signer)
+  // const outcomeSlotCount = 2
 
-  const conditionId = getConditionId(questionId, oracleAddress, outcomeSlotCount)
+  // const conditionId = getConditionId(questionId, oracleAddress, outcomeSlotCount)
   
-  // Upsert condition.
-  const conditionExists = await doesConditionExist(conditionalTokens, conditionId)
+  // // Upsert condition.
+  // const conditionExists = await doesConditionExist(conditionalTokens, conditionId)
 
-  // Step 2: Prepare condition
-  if (!conditionExists) {
-    const outcomeSlotCount = 2
-    const args = [oracleAddress, questionId, outcomeSlotCount]
-    const res = await conditionalTokens.prepareCondition(...args)
-  } else {
-    console.log(`Condition ${conditionId} already exists`)
-    return
-  }
+  // // Step 2: Prepare condition
+  // if (!conditionExists) {
+  //   const outcomeSlotCount = 2
+  //   const args = [oracleAddress, questionId, outcomeSlotCount]
+  //   const res = await conditionalTokens.prepareCondition(...args)
+  // } else {
+  //   console.log(`Condition ${conditionId} already exists`)
+  //   return
+  // }
 
-  console.log(`ConditionID: ${conditionId}`)
+  // console.log(`ConditionID: ${conditionId}`)
 
-  // Step 3: Approve collateral for factory
-  // Rinkeby WETH
+  // // Step 3: Approve collateral for factory
+  // // Rinkeby WETH
   
-  // aka FPMMDeterministicFactory
-  const marketMakerFactoryAddress = FP_MARKET_MAKER_FACTORY_ADDRESS
+  // // aka FPMMDeterministicFactory
+  // const marketMakerFactoryAddress = FP_MARKET_MAKER_FACTORY_ADDRESS
 
 
-  const collateralTokenAddress = COLLATERAL_TOKEN_ADDRESS
-  const collateralToken = new ethers.Contract(collateralTokenAddress, wethAbi, signer)
-  console.log(`collateralToken.approve()`)
-  const ammFunding = 10000
-  await collateralToken.deposit({ value: ammFunding }); // mint WETH
-  await collateralToken.approve(marketMakerFactoryAddress, ethers.constants.MaxUint256, {
-    value: '0x0',
-  })
+  // const collateralTokenAddress = WETH9
+  // const collateralToken = new ethers.Contract(collateralTokenAddress, wethAbi, signer)
+  // console.log(`collateralToken.approve()`)
+  // const ammFunding = 10000
+  // await collateralToken.deposit({ value: ammFunding }); // mint WETH
+  // await collateralToken.approve(marketMakerFactoryAddress, ethers.constants.MaxUint256, {
+  //   value: '0x0',
+  // })
 
-  // Step 5: Create market maker
-  const signerAddress = await signer.getAddress()
-  let marketMakerFactory = new MarketMakerFactoryService(marketMakerFactoryAddress, provider, signer, signerAddress)
+  // // Step 5: Create market maker
+  // const signerAddress = await signer.getAddress()
+  // let marketMakerFactory = new MarketMakerFactoryService(marketMakerFactoryAddress, provider, signer, signerAddress)
 
-  const saltNonce = Math.round(Math.random() * 1000000)
-  const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
-    saltNonce,
-    conditionalTokens.address,
-    collateralToken.address,
-    conditionId,
-    signerAddress,
-    // spread,
-  )
-  console.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+  // const saltNonce = Math.round(Math.random() * 1000000)
+  // const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+  //   saltNonce,
+  //   conditionalTokens.address,
+  //   collateralToken.address,
+  //   conditionId,
+  //   signerAddress,
+  //   // spread,
+  // )
+  // console.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
   
-  await marketMakerFactory.createMarketMaker(saltNonce, conditionalTokens.address, collateralToken.address, conditionId)
-  console.log('Market created!')
-  console.log(`https://omen.eth.link/#/${predictedMarketMakerAddress}`)
+  // await marketMakerFactory.createMarketMaker(saltNonce, conditionalTokens.address, collateralToken.address, conditionId)
+  // console.log('Market created!')
+  // console.log(`https://omen.eth.link/#/${predictedMarketMakerAddress}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

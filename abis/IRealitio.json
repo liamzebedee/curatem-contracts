@@ -2,47 +2,102 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "question_id",
-        "type": "bytes32"
+        "internalType": "uint256",
+        "name": "template_id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "question",
+        "type": "string"
       },
       {
         "internalType": "address",
-        "name": "requester",
+        "name": "arbitrator",
         "type": "address"
       },
       {
+        "internalType": "uint32",
+        "name": "timeout",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "opening_ts",
+        "type": "uint32"
+      },
+      {
         "internalType": "uint256",
-        "name": "max_previous",
+        "name": "nonce",
         "type": "uint256"
       }
     ],
-    "name": "notifyOfArbitrationRequest",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "askQuestion",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "question_id",
+        "name": "questionId",
         "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "answer",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "address",
-        "name": "answerer",
-        "type": "address"
       }
     ],
-    "name": "submitAnswerByArbitrator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "getContentHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "questionId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getOpeningTS",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "questionId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "resultFor",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

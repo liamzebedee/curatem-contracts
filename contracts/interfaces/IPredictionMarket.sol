@@ -1,5 +1,6 @@
-pragma solidity >=0.6.0;
+// pragma solidity ^0.5.5;
 
-interface PredictionMarket {
-    function reportPayouts();
+
+interface IPredictionMarket {
+    function reportPayouts(bytes32 id, uint[] calldata payouts) external;
 }

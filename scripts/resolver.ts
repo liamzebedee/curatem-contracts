@@ -66,24 +66,38 @@ abstract class ContractResolver {
     console.log(networkId)
   
     let resolver: ContractResolver
+    let resolver2: ContractResolver
     
     if(networkId == 31337) {
       // This is a development network.
       // Load the addresses from the build artifacts.
       resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts/'))
+      resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts/'))
     }
-  
-    const contracts = [
+
+    const omenContracts = [
       'Realitio',
       'RealitioProxy',
       'ConditionalTokens',
       'FPMMDeterministicFactory',
       'WETH9'
     ]
+    const balancerContracts = [
+      'BFactory'
+    ]
+
+    function resolveWithResolver(contracts: string[], resolver: ContractResolver) {
+      return contracts
+        .reduce((addresses: ContractAddresses, contract: string) => {
+          addresses[contract] = resolver.resolve(contract)
+          return addresses
+        }, {})
+    }
     
-    return contracts
-      .reduce((addresses: ContractAddresses, contract: string) => {
-        addresses[contract] = resolver.resolve(contract)
-        return addresses
-      }, {})
-  }
+    return {
+      ...resolveWithResolver(omenContracts, resolver),
+      ...resolveWithResolver(balancerContracts, resolver2)
+    }   
+}
+
+

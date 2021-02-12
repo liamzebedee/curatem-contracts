@@ -1,6 +1,7 @@
 import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 import 'hardhat-abi-exporter'
+import 'hardhat-contract-sizer'
 
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -21,20 +22,24 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
  */
 export default {
   solidity: {
+    optimizer: {
+      enabled: true,
+      runs: 200
+    },
+
     compilers: [
       {
         version: "0.5.5"
       },
       {
-        version: "0.6.2"
+        version: "0.6.4"
       },
       {
-        version: "0.7.0",
-        settings: { } 
+        version: "0.7.0"
       }
     ],
     // overrides: {
-    //   "contracts/CuratemCommunity.sol": {
+    //   "contracts/vendor/CTHelpers.sol": {
     //     version: "0.5.5",
     //     settings: { }
     //   }
@@ -43,10 +48,22 @@ export default {
   defaultNetwork: "development",
   networks: {
     hardhat: {
+      forking: {
+        url: "http://localhost:8545"
+      }
     },
+
     development: {
       url: "http://localhost:8545",
     },
+
+    
+
+    devKovan: {
+      url: "http://localhost:8547",
+      accounts: [process.env.ETH_ACCOUNT_PRIVKEY]
+    },
+    
     rinkeby: {
       url: process.env.ETH_RPC_URL,
       accounts: [process.env.ETH_ACCOUNT_PRIVKEY]

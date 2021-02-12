@@ -1,8 +1,19 @@
-pragma solidity ^0.5.5;
+// pragma solidity ^0.5.5;
 
-import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 library CTHelpers {
+    function generateBasicPartition(uint outcomeSlotCount)
+        public
+        pure
+        returns (uint[] memory partition)
+    {
+        partition = new uint[](outcomeSlotCount);
+        for(uint i = 0; i < outcomeSlotCount; i++) {
+            partition[i] = 1 << i;
+        }
+    }
+
     /// @dev Constructs a condition ID from an oracle, a question ID, and the outcome slot count for the question.
     /// @param oracle The account assigned to report the result for the prepared condition.
     /// @param questionId An identifier for the question to be answered by the oracle.
