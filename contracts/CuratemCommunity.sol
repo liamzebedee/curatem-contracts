@@ -35,7 +35,7 @@ contract CuratemCommunity {
     address bFactory;
     address factory;
 
-    uint32 constant timeoutResolution = 5 minutes;
+    uint32 timeoutResolution = 5 minutes;
     uint constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
 
@@ -82,6 +82,10 @@ contract CuratemCommunity {
         address oracle;
     }
 
+    function setTimeout(uint32 _timeoutResolution) public {
+        timeoutResolution = _timeoutResolution;
+    }
+
     function createPredictionMarket(
         string memory url
     ) 
@@ -97,8 +101,8 @@ contract CuratemCommunity {
             question: string(abi.encodePacked(
                 "Is this spam?", REALITIO_UNICODE_SEPERATOR, "\"Spam\",\"Not spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
             arbitrator: moderator,
-            timeout: 180,
-            opening_ts: uint32(block.timestamp + timeoutResolution),
+            timeout: timeoutResolution,
+            opening_ts: uint32(block.timestamp),
             nonce: uint256(hashDigest),
             oracle: realityIoGnosisProxy
         });

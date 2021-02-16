@@ -165,9 +165,15 @@ contract SpamPredictionMarket {
     enum MARKET_STATUS {
         INITIALIZING,
         OPEN,
-        REPORTING,
         FINALIZED
     }
+
+    event Initialized();
+    event PoolCreated(address pool);
+    event SharesBought(address user, uint amount);
+    event SharesSold(address user, uint amount);
+    event Finalized(uint finalOutcome);
+    event SharesRedeemed(address user, uint amount);
     
     IBFactory bFactory;
     Factory factory;
@@ -186,11 +192,6 @@ contract SpamPredictionMarket {
 
     modifier isOpen() {
         require(marketState == uint(MARKET_STATUS.OPEN), "Market is not in OPEN state.");
-        _;
-    }
-
-    modifier isReporting() {
-        require(marketState == uint(MARKET_STATUS.REPORTING), "Market is not in REPORTING state.");
         _;
     }
 
@@ -223,6 +224,7 @@ contract SpamPredictionMarket {
         outcomeTokens[1] = OutcomeToken(factory.newOutcomeToken("Spam", "SPAM", address(this)));
 
         marketState = uint8(MARKET_STATUS.OPEN);
+        emit Initialized();
     }
 
     function createPool(
@@ -272,6 +274,7 @@ contract SpamPredictionMarket {
         // Transfer LP share to creator.
         pool.transferFrom(address(this), msg.sender, pool.balanceOf(address(this)));
 
+        emit PoolCreated(address(pool));
         return address(pool);
     }
 
@@ -291,6 +294,7 @@ contract SpamPredictionMarket {
         for(uint i = 0; i < outcomeTokens.length; i++) {
             outcomeTokens[i].mint(msg.sender, amount);
         }
+        emit SharesBought(msg.sender, amount);
     }
 
     function sell(uint amount) 
@@ -309,6 +313,7 @@ contract SpamPredictionMarket {
             outcomeTokens[i].burn(address(msg.sender), amount);
         }
         collateralToken.transferFrom(address(this), msg.sender, amount);
+        emit SharesSold(msg.sender, amount);
     }
 
     // function report(uint8 _finalOutcome) 
@@ -346,6 +351,7 @@ contract SpamPredictionMarket {
         require(sum == 1, "payouts must resolve to one and only one final outcome");
         finalOutcome = uint8(firstPayoutIdx);
         marketState = uint8(MARKET_STATUS.FINALIZED);
+        emit Finalized(finalOutcome);
     }
 
     function redeem(uint amount) 
@@ -363,6 +369,7 @@ contract SpamPredictionMarket {
         );
         outcomeToken.transferFrom(msg.sender, address(this), amount);
         collateralToken.transferFrom(address(this), msg.sender, amount);
+        emit SharesRedeemed(msg.sender, amount);
     }
 
     function getOutcome()

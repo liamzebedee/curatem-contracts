@@ -2,6 +2,7 @@
   "name": "@curatem/contracts",
   "version": "0.0.1",
   "scripts": {
+    "test:create-market": "yarn hardhat run scripts/create-market-fpmm.ts",
     "deploy": "yarn hardhat run scripts/deploy.ts"
   },
   "devDependencies": {

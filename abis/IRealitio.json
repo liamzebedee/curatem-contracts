@@ -47,6 +47,25 @@
     "inputs": [
       {
         "internalType": "bytes32",
+        "name": "question_id",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getBond",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
         "name": "questionId",
         "type": "bytes32"
       }
@@ -98,6 +117,29 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "question_id",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "answer",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "max_previous",
+        "type": "uint256"
+      }
+    ],
+    "name": "submitAnswer",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   }
 ]

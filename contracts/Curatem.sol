@@ -34,7 +34,6 @@ contract Curatem {
         address _bFactory,
         address _factory
     ) public returns (address) {
-        // { salt: salt }
         CuratemCommunity community = new CuratemCommunity(
             realitio,
             realityIoGnosisProxy,

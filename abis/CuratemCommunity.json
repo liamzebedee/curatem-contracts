@@ -217,6 +217,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint32",
+        "name": "_timeoutResolution",
+        "type": "uint32"
+      }
+    ],
+    "name": "setTimeout",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes32",
         "name": "conditionId",
         "type": "bytes32"

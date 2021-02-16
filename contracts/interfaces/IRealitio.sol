@@ -5,4 +5,6 @@ interface IRealitio {
     function getContentHash(bytes32 questionId) external view returns (bytes32);
     function getOpeningTS(bytes32 questionId) external view returns (uint32);
     function resultFor(bytes32 questionId) external view returns (bytes32);
+    function getBond ( bytes32 question_id ) external view returns ( uint256 );
+    function submitAnswer ( bytes32 question_id, bytes32 answer, uint256 max_previous ) external payable;
 }
