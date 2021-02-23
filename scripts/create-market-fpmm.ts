@@ -11,7 +11,6 @@ import '@nomiclabs/hardhat-ethers'
 
 import * as RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
-import { MarketMakerFactoryService } from "./market_maker_factory"
 import * as IPFS from 'ipfs-core'
 import * as ipfsClient from 'ipfs-http-client'
 
@@ -154,11 +153,9 @@ async function resolveContracts(provider: ethers.providers.Provider): Promise<Co
 
   let resolver: ContractResolver
   
-  if(networkId == 31337) {
-    // This is a development network.
-    // Load the addresses from the build artifacts.
-    resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts/'))
-  }
+  // This is a development network.
+  // Load the addresses from the build artifacts.
+  resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts/'))
 
   const contracts = [
     'Realitio',
@@ -282,25 +279,27 @@ async function main() {
     value: toWei('5')
   })
 
-  await scripts.buyAndCreatePool(market, toWei('2'), toWei('2'))
+  // await scripts.buyAndCreatePool(market, toWei('2'), toWei('2'))
   
-  {
-    const tokenAddress = (await predictionMarket.spamToken())
-    console.log(
-      tokenAddress
-    )
-    const token = await hre.ethers.getContractAt("OutcomeToken", tokenAddress)
-    console.log(
-      await token.balanceOf(await signer.getAddress())
-    )
+  // {
+  //   const tokenAddress = (await predictionMarket.spamToken())
+  //   console.log(
+  //     tokenAddress
+  //   )
+  //   const token = await hre.ethers.getContractAt("OutcomeToken", tokenAddress)
+  //   console.log(
+  //     await token.balanceOf(await signer.getAddress())
+  //   )
 
-    const poolAddress = (await predictionMarket.pool())
-    console.log(poolAddress)
-    const poolToken = new ethers.Contract(poolAddress, erc20Abi, signer)
-    console.log(
-      await poolToken.balanceOf(await signer.getAddress())
-    )
-  }
+  //   const poolAddress = (await predictionMarket.pool())
+  //   console.log(poolAddress)
+  //   const poolToken = new ethers.Contract(poolAddress, erc20Abi, signer)
+  //   console.log(
+  //     await poolToken.balanceOf(await signer.getAddress())
+  //   )
+  // }
+
+
   // await predictionMarket.buyAndCreatePool(toWei('2'))
 
 

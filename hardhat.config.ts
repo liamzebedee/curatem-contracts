@@ -46,22 +46,18 @@ export default {
     // }
   },
   defaultNetwork: "development",
+
   networks: {
     hardhat: {
+      chainId: 42,
       forking: {
-        url: "http://localhost:8545"
+        url: process.env.FORKING_KOVAN_URL,
+        enabled: !!process.env.FORKING_ENABLED
       }
     },
 
     development: {
       url: "http://localhost:8545",
-    },
-
-    
-
-    devKovan: {
-      url: "http://localhost:8547",
-      accounts: [process.env.ETH_ACCOUNT_PRIVKEY]
     },
     
     rinkeby: {

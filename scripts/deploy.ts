@@ -13,6 +13,7 @@ import { utils, Contract, ethers } from 'ethers'
 
 const DEPLOYMENTS_PATH = join(__dirname, '../deployments.json')
 
+
 async function main() {
   let network = await hre.ethers.provider.getNetwork()
   let networkId = network.chainId
@@ -130,6 +131,8 @@ async function main() {
     
 
     // 2. Deploy an example community.
+
+    // Deposit some WETH at the user's address.
     const communities = [
       {
         id: 'RedditCommunity1',
@@ -169,7 +172,7 @@ async function main() {
     // ---------------------
 
     if(!deployments[networkId]) 
-      throw new Error(`No deployment configuration defined for network ID ${networkId}.`)
+      deployments[networkId] = {}
 
     for(let [contract, instance] of Object.entries(contracts)) {
       const { hash, blockHash, blockNumber } = instance.deployTransaction

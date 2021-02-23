@@ -258,7 +258,7 @@ contract SpamPredictionMarket {
             "notSpamToken balance must be greater than 10**6"
         );
 
-        collateralToken.transferFrom(creator, address(this), amount);
+        collateralToken.transferFrom(creator, address(this), amount); 
         spamToken().transferFrom(creator, address(this), amount);
         notSpamToken().transferFrom(creator, address(this), amount);
         

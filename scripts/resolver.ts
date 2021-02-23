@@ -19,6 +19,9 @@ abstract class ContractResolver {
       let address: string
       let artifactPath = `${this.path}/${contract}.json`
       try {
+        // TODO: throw more descriptive errors.
+        // 1. If artifactpath isn't found.
+        // 2. If contract was not deployed for networkId
         const artifact = require(artifactPath)
         address = artifact.networks[this.networkId].address
       } catch(ex) {
@@ -68,11 +71,14 @@ abstract class ContractResolver {
     let resolver: ContractResolver
     let resolver2: ContractResolver
     
-    if(networkId == 31337) {
+    if(networkId == 31337 || networkId == 42) {
       // This is a development network.
       // Load the addresses from the build artifacts.
-      resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts/'))
-      resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts/'))
+      resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts'))
+      resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts'))
+    } else {
+      console.warn(`Network ${networkId} not configured with contracts for resolution`)
+      return {}
     }
 
     const omenContracts = [

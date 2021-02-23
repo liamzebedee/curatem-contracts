@@ -38,6 +38,7 @@ contract CuratemCommunity {
     uint32 timeoutResolution = 5 minutes;
     uint constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
+    uint constant MAX_UINT = 2**256 - 1;
 
     constructor(
         address _realitio,
@@ -124,6 +125,9 @@ contract CuratemCommunity {
         );
         market.initialize();
 
+        // Allow market to call transferFrom on these tokens.
+        // token.approve(market, MAX_UINT);
+
         emit NewSpamPredictionMarket(hashDigest, questionId, address(market));
         return address(market);
     }
@@ -207,6 +211,21 @@ contract CuratemCommunity {
         );
         return tokenId;
     }
+
+    /**
+    //  * @param from The user we are transferring tokens from.
+    //  * @param to The external contract requesting proxied transfer.
+    //  */
+    // function proxyTransfer(address from, uint amount)  
+    //     external 
+    // {
+    //     address to = msg.sender;
+    //     // require(to == msg.sender, "proxyTransfer can only be called by contract");
+    //     require(token.allowance(from, address(this)) >= amount, "allowance not granted to CuratemCommunity by user");
+    //     require(token.allowance(address(this), to) >= amount, "allowance not granted for proxy transfer");
+    //     require(token.balanceOf(from) >= amount, "proxy transfer amount >= balance");
+    //     token.transferFrom(from, to, amount);
+    // }
 
     // function buy(
     //     bytes32 conditionId,
