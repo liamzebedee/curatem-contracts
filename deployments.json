@@ -1,34 +1,34 @@
 {
     "42": {
         "ModeratorArbitrator": {
-            "address": "0x5fc748f1FEb28d7b76fa1c6B07D8ba2d5535177c",
-            "hash": "0xa983091b123583695f1910656174087cfb81674ae93d2460aa2669bcd5528510",
-            "blockHash": "0xd1e1f8a2e98974dff7876e4163e8868341ad8c7986e2302a7c5b90733fb754d4",
-            "blockNumber": 128
+            "address": "0x870526b7973b56163a6997bB7C886F5E4EA53638",
+            "hash": "0xb86157c0dc88cb69c45dc5b95f2c40ff31038a463543e808d57f8dbfc1749a63",
+            "blockHash": "0x93efe87bc3b9763ec4b00b4c5b86f35ec90c200a6758553c91c54059341e6db2",
+            "blockNumber": 161
         },
         "Scripts": {
-            "address": "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
-            "hash": "0x863db34d00ab7c1b00108dc5b45b928e34ab3d76759843e7838c4007c3812052",
-            "blockHash": "0x9c4d25823e219bede4cd7289484dd2e259de6694ed07399db2edd098af9e5e1e",
-            "blockNumber": 130
+            "address": "0xe1Fd27F4390DcBE165f4D60DBF821e4B9Bb02dEd",
+            "hash": "0x4f1f16bfc5401cfc497e176939fe1b363bb290271f59c50778e65e45602b07c4",
+            "blockHash": "0xcc569ba980f4971ca6547e5601372052d7e62ccb95cd5ef8949f68436533e66d",
+            "blockNumber": 163
         },
         "Factory": {
-            "address": "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
-            "hash": "0x31ad7adc408eb909eb189b0235646b4d6688b3c1c992de2a7873a71f7be5a218",
-            "blockHash": "0x0cd3d6ecf7fc7f3534b78be763f99d51241a5241ea0945dc35a3474b27e138bc",
-            "blockNumber": 131
+            "address": "0xc582Bc0317dbb0908203541971a358c44b1F3766",
+            "hash": "0xa6a004c94aef50ac739af16e922a2778212eb2c200912abcb5af043b410c6052",
+            "blockHash": "0xd0956c6ad2adb61727f3fec08d4e48eeeba563da8e35a16b7e7cd55cee14546f",
+            "blockNumber": 164
         },
         "Curatem": {
-            "address": "0x40918Ba7f132E0aCba2CE4de4c4baF9BD2D7D849",
-            "hash": "0x2a698c52ce1d8bc14d11ec7bb0a45b909c86a1fdf65b7b3c450486be7903b68d",
-            "blockHash": "0x52017c96fea385f240e638e8aea780aa9c55a60768e40aa2b3537333c03cb16e",
-            "blockNumber": 133
+            "address": "0xB377a2EeD7566Ac9fCb0BA673604F9BF875e2Bab",
+            "hash": "0x338f038d634e05407783688e2481fbab642dc67d0c9656df74cdda01a7a77d23",
+            "blockHash": "0x557a8c48b77c440bfdcefa3dc00201f502cf99ba05c741552a93b280bbbe788c",
+            "blockNumber": 166
         },
         "RedditCommunity1": {
-            "address": "0xdE1FB1BE65a44C73761ebDABb10c4b101bc819c7",
-            "hash": "0x3e6b25aa16dd4466c0743fa9596b20f25f62f9e37177fb766538d7c4860b0dd7",
-            "blockHash": "0xbbe070db353ab93f800f3ec3b12773650a3197f81c83981fa6e4f8440855cc89",
-            "blockNumber": 134
+            "address": "0x890D0a432Cef5328d8BDD7B31D0dFAB908bFd261",
+            "hash": "0xcefbae5b20633d7d53d342f9a92b2420b57d8bc476e6718ef2ecddc222c8ab83",
+            "blockHash": "0x1525d1a3d938a1ce5ddb17f0333338d2d0dc3adf00269350608e839e945e69fb",
+            "blockNumber": 167
         }
     },
     "31337": {

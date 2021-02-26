@@ -4,6 +4,9 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./vendor/Owned.sol";
 import "./interfaces/IBPool.sol";
+import "./interfaces/IOutcomeToken.sol";
+import "./tokens/OutcomeToken.sol";
+import "./factories/Factory.sol";
 
 interface IBFactory {
     function newBPool() external returns (address);
@@ -12,149 +15,6 @@ interface IBFactory {
 interface IOracle {
 }
 
-
-interface IOutcomeToken is IERC20 {
-    function burn(address account, uint amount) external;
-    function mint(address account, uint amount) external;
-}
-
-import "./vendor/Initializable.sol";
-
-contract OutcomeToken is ERC20, Owned, IOutcomeToken, Initializable {
-    uint constant MAX_UINT = 2**256 - 1;
-
-    string private _name;
-    string private _symbol;
-
-    constructor() 
-        public 
-        ERC20("", "")
-        Owned(msg.sender)
-    {
-    }
-
-    function initialize(
-        string memory name, 
-        string memory ticker, 
-        address _predictionMarket
-    ) 
-        public 
-        uninitialized
-    {
-        // ERC20(name, ticker) 
-        _name = name;
-        _symbol = ticker;
-        // Owned(_predictionMarket) 
-        owner = _predictionMarket;
-    }
-
-    function mint(address account, uint amount) 
-        external 
-        override
-        onlyOwner() 
-    {
-        _mint(account, amount);
-    }
-
-    function burn(address account, uint amount) 
-        external 
-        override
-        onlyOwner() 
-    {
-        _burn(account, amount);
-    }
-
-    function name()
-        public
-        view
-        override
-        returns (string memory)
-    {
-        return _name;
-    }
-
-    function symbol()
-        public
-        view
-        override
-        returns (string memory)
-    {
-        return _symbol;
-    }
-
-    // function allowance(address owner, address spender) 
-    //     external 
-    //     view 
-    //     override
-    //     returns (uint256)
-    // {
-    //     // Allow _predictionMarket to transfer without approvals.
-    //     // This is use
-    //     if(spender == msg.sender) {
-    //         return MAX_UINT;
-    //     }
-    //     return _allowance(owner, spender);
-    // }
-}
-
-import "./vendor/CloneFactory.sol";
-
-
-
-
-contract Factory is Initializable {
-    address public outcomeToken;   
-
-    constructor() public {}
-    function initialize()
-        public 
-        uninitialized
-    {
-        outcomeToken = address(new OutcomeToken());
-    }
-
-    function newOutcomeToken(
-        string calldata name, 
-        string calldata ticker, 
-        address _predictionMarket
-    )
-        external
-        returns (address)
-    {
-        address clone = createClone(outcomeToken);
-        OutcomeToken(clone).initialize(name, ticker, _predictionMarket);
-        return clone;
-    }
-
-
-function createClone(address target) internal returns (address result) {
-    bytes20 targetBytes = bytes20(target);
-    assembly {
-      let clone := mload(0x40)
-      mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
-      mstore(add(clone, 0x14), targetBytes)
-      mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
-      result := create(0, clone, 0x37)
-    }
-  }
-
-  function isClone(address target, address query) internal view returns (bool result) {
-    bytes20 targetBytes = bytes20(target);
-    assembly {
-      let clone := mload(0x40)
-      mstore(clone, 0x363d3d373d3d3d363d7300000000000000000000000000000000000000000000)
-      mstore(add(clone, 0xa), targetBytes)
-      mstore(add(clone, 0x1e), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
-
-      let other := add(clone, 0x40)
-      extcodecopy(query, other, 0, 0x2d)
-      result := and(
-        eq(mload(clone), mload(other)),
-        eq(mload(add(clone, 0xd)), mload(add(other, 0xd)))
-      )
-    }
-  } 
-}
 
 
 
@@ -228,9 +88,9 @@ contract SpamPredictionMarket {
     }
 
     function createPool(
-        uint amount
+        uint256[3] calldata amounts
     ) 
-        public
+        external
         isOpen
         returns (address)
     {
@@ -258,9 +118,9 @@ contract SpamPredictionMarket {
             "notSpamToken balance must be greater than 10**6"
         );
 
-        collateralToken.transferFrom(creator, address(this), amount); 
-        spamToken().transferFrom(creator, address(this), amount);
-        notSpamToken().transferFrom(creator, address(this), amount);
+        collateralToken.transferFrom(creator, address(this), amounts[0]); 
+        spamToken().transferFrom(creator, address(this), amounts[1]);
+        notSpamToken().transferFrom(creator, address(this), amounts[2]);
         
         // Bind the pool tokens.
         pool.bind(address(collateralToken), collateralToken.balanceOf(address(this)), outcomeTokens.length * 10**18);
@@ -394,29 +254,5 @@ contract SpamPredictionMarket {
         returns (IOutcomeToken)
     {
         return outcomeTokens[1];
-    }
-}
-
-contract Scripts {
-    uint constant MAX_UINT = 2**256 - 1;
-    // Approve collateral tokens for this script.
-    // Then run the tx.
-    // Which will transfer collateralToken to the script,
-    // call buy, which mints the outcome tokens
-    // and then creates the exchange
-    // which mints the lp shares
-    // and then send it back to the user
-    function buyAndCreatePool(address _market, uint buyAmount, uint liquidityAmount) 
-        external
-    {
-        SpamPredictionMarket market = SpamPredictionMarket(_market);
-        IERC20(market.collateralToken()).transferFrom(msg.sender, address(this), buyAmount + liquidityAmount);
-        IERC20(market.collateralToken()).approve(_market, MAX_UINT);
-        market.buy(buyAmount);
-
-        IERC20(market.spamToken()).approve(_market, MAX_UINT);
-        IERC20(market.notSpamToken()).approve(_market, MAX_UINT);
-        address pool = market.createPool(liquidityAmount);
-        IERC20(pool).transferFrom(address(this), msg.sender, IERC20(pool).balanceOf(address(this)));
     }
 }
