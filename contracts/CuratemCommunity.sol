@@ -132,85 +132,86 @@ contract CuratemCommunity {
         return address(market);
     }
 
-    function createGnosisMarket(
-        string memory url
-    ) 
-        internal returns (address) 
-    {
-        bytes32 hashDigest = sha256(abi.encodePacked(url));
-        require(bytes(itemUrlForDigest[hashDigest]).length == 0, "Market already created for URL");
-        itemUrlForDigest[hashDigest] = url;
-        
-        QuestionIdVars memory questionId_vars = QuestionIdVars({
-            template_id: 2,
-            // "Is this spam? https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
-            question: string(abi.encodePacked(
-                "Is this spam?", REALITIO_UNICODE_SEPERATOR, "\"Spam\",\"Not spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
-            arbitrator: moderator,
-            timeout: 180,
-            opening_ts: uint32(block.timestamp + timeoutResolution),
-            nonce: uint256(hashDigest),
-            oracle: realityIoGnosisProxy
-        });
-
-        // Create the market for the post ID.
-        bytes32 questionId = realitio.askQuestion(
-            questionId_vars.template_id, 
-            questionId_vars.question, 
-            questionId_vars.arbitrator, 
-            questionId_vars.timeout, 
-            questionId_vars.opening_ts, 
-            questionId_vars.nonce);
-        
-        bytes32 conditionId = CTHelpers.getConditionId(questionId_vars.oracle, questionId, SPAM_MARKET_OUTCOME_SLOT_COUNT);
-
-        conditionalTokens.prepareCondition(
-            questionId_vars.oracle,
-            questionId, 
-            SPAM_MARKET_OUTCOME_SLOT_COUNT);
-
-
-        uint[] memory distributionHint;
-        bytes32[] memory conditionIds = new bytes32[](1);
-        conditionIds[0] = conditionId;
-
-        address fixedProductMarketMaker = fpmmFactory.create2FixedProductMarketMaker(
-            questionId_vars.nonce, // saltNonce, 
-            address(conditionalTokens), 
-            address(token), // collateralAddress, 
-            conditionIds,
-            0, // fee, 
-            0, 
-            distributionHint
-        );
-
-        emit MarketCreated(hashDigest, conditionId, questionId, fixedProductMarketMaker);
-        return fixedProductMarketMaker;
-    }
-
     function getUrl(bytes32 digest) public view returns (string memory) {
         return itemUrlForDigest[digest];
     }
 
-    function spamToken(bytes32 conditionId) public view returns (uint256 tokenId) {
-        bytes32 NULL_PARENT_COLLECTION = bytes32(0);
-        return CTHelpers.getPositionId(token, CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, 0x1));
-    }
 
-    function notSpamToken(bytes32 conditionId) public view returns (uint256 tokenId) {
-        bytes32 NULL_PARENT_COLLECTION = bytes32(0);
-        return CTHelpers.getPositionId(token, CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, 0x2));
-    }
+    // function createGnosisMarket(
+    //     string memory url
+    // ) 
+    //     internal returns (address) 
+    // {
+    //     bytes32 hashDigest = sha256(abi.encodePacked(url));
+    //     require(bytes(itemUrlForDigest[hashDigest]).length == 0, "Market already created for URL");
+    //     itemUrlForDigest[hashDigest] = url;
+        
+    //     QuestionIdVars memory questionId_vars = QuestionIdVars({
+    //         template_id: 2,
+    //         // "Is this spam? https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
+    //         question: string(abi.encodePacked(
+    //             "Is this spam?", REALITIO_UNICODE_SEPERATOR, "\"Spam\",\"Not spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
+    //         arbitrator: moderator,
+    //         timeout: 180,
+    //         opening_ts: uint32(block.timestamp + timeoutResolution),
+    //         nonce: uint256(hashDigest),
+    //         oracle: realityIoGnosisProxy
+    //     });
 
-    function getPositionToken(bytes32 conditionId, uint outcome) public view returns (uint256 tokenId) {
-        uint[] memory partition = CTHelpers.generateBasicPartition(SPAM_MARKET_OUTCOME_SLOT_COUNT);
-        bytes32 NULL_PARENT_COLLECTION = 0x0;
-        tokenId = CTHelpers.getPositionId(
-            token, 
-            CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, partition[outcome])
-        );
-        return tokenId;
-    }
+    //     // Create the market for the post ID.
+    //     bytes32 questionId = realitio.askQuestion(
+    //         questionId_vars.template_id, 
+    //         questionId_vars.question, 
+    //         questionId_vars.arbitrator, 
+    //         questionId_vars.timeout, 
+    //         questionId_vars.opening_ts, 
+    //         questionId_vars.nonce);
+        
+    //     bytes32 conditionId = CTHelpers.getConditionId(questionId_vars.oracle, questionId, SPAM_MARKET_OUTCOME_SLOT_COUNT);
+
+    //     conditionalTokens.prepareCondition(
+    //         questionId_vars.oracle,
+    //         questionId, 
+    //         SPAM_MARKET_OUTCOME_SLOT_COUNT);
+
+
+    //     uint[] memory distributionHint;
+    //     bytes32[] memory conditionIds = new bytes32[](1);
+    //     conditionIds[0] = conditionId;
+
+    //     address fixedProductMarketMaker = fpmmFactory.create2FixedProductMarketMaker(
+    //         questionId_vars.nonce, // saltNonce, 
+    //         address(conditionalTokens), 
+    //         address(token), // collateralAddress, 
+    //         conditionIds,
+    //         0, // fee, 
+    //         0, 
+    //         distributionHint
+    //     );
+
+    //     emit MarketCreated(hashDigest, conditionId, questionId, fixedProductMarketMaker);
+    //     return fixedProductMarketMaker;
+    // }
+
+    // function spamToken(bytes32 conditionId) public view returns (uint256 tokenId) {
+    //     bytes32 NULL_PARENT_COLLECTION = bytes32(0);
+    //     return CTHelpers.getPositionId(token, CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, 0x1));
+    // }
+
+    // function notSpamToken(bytes32 conditionId) public view returns (uint256 tokenId) {
+    //     bytes32 NULL_PARENT_COLLECTION = bytes32(0);
+    //     return CTHelpers.getPositionId(token, CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, 0x2));
+    // }
+
+    // function getPositionToken(bytes32 conditionId, uint outcome) public view returns (uint256 tokenId) {
+    //     uint[] memory partition = CTHelpers.generateBasicPartition(SPAM_MARKET_OUTCOME_SLOT_COUNT);
+    //     bytes32 NULL_PARENT_COLLECTION = 0x0;
+    //     tokenId = CTHelpers.getPositionId(
+    //         token, 
+    //         CTHelpers.getCollectionId(NULL_PARENT_COLLECTION, conditionId, partition[outcome])
+    //     );
+    //     return tokenId;
+    // }
 
     /**
     //  * @param from The user we are transferring tokens from.

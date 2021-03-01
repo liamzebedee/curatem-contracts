@@ -9,12 +9,12 @@ import "./interfaces/IOutcomeToken.sol";
 import "./tokens/OutcomeToken.sol";
 import "./factories/Factory.sol";
 
-interface IBFactory {
-    function newBPool() external returns (address);
-}
+// interface IBFactory {
+//     function newBPool() external returns (address);
+// }
 
-interface IOracle {
-}
+// interface IOracle {
+// }
 
 interface IFlashLoanReceiver {
     function onFlashLoan(uint256 amount) external;
@@ -44,7 +44,7 @@ contract SpamPredictionMarket {
     Factory factory;
     IBPool public pool;
     IERC20 public collateralToken;
-    IOracle public oracle;
+    address public oracle;
     IOutcomeToken[2] public outcomeTokens;
 
     uint8 marketState = uint8(MARKET_STATUS.INITIALIZING);
@@ -73,7 +73,7 @@ contract SpamPredictionMarket {
     ) 
         public
     {
-        oracle = IOracle(_oracle);
+        oracle = _oracle;
         collateralToken = IERC20(_collateralToken);
         uniswapFactory = IUniswapV2Factory(_uniswapFactory);
         factory = Factory(_factory);
@@ -259,7 +259,7 @@ contract SpamPredictionMarket {
     }
 
     function getOutcome()
-        public
+        public view
         isFinalized
         returns (uint8)
     {
