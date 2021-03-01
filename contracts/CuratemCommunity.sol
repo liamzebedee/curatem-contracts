@@ -32,7 +32,7 @@ contract CuratemCommunity {
     IConditionalTokens conditionalTokens;
     IFPMMDeterministicFactory fpmmFactory;
     address realityIoGnosisProxy;
-    address bFactory;
+    address uniswapFactory;
     address factory;
 
     uint32 timeoutResolution = 5 minutes;
@@ -45,7 +45,7 @@ contract CuratemCommunity {
         address _realityIoGnosisProxy,
         address _conditionalTokens,
         address _fpmmFactory,
-        address _bFactory,
+        address _uniswapFactory,
         address _factory,
         address _token,
         address _moderator
@@ -57,10 +57,10 @@ contract CuratemCommunity {
         conditionalTokens = IConditionalTokens(_conditionalTokens);
         fpmmFactory = IFPMMDeterministicFactory(_fpmmFactory);
         factory = _factory;
+        uniswapFactory = _uniswapFactory;
 
         token = IERC20(_token);
         moderator = _moderator;
-        bFactory = _bFactory;
     }
 
 
@@ -120,7 +120,7 @@ contract CuratemCommunity {
         SpamPredictionMarket market = new SpamPredictionMarket(
             questionId_vars.oracle,
             address(token),
-            bFactory,
+            uniswapFactory,
             factory
         );
         market.initialize();

@@ -2,6 +2,7 @@ pragma solidity >=0.6.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 import "./vendor/Owned.sol";
 import "./interfaces/IBPool.sol";
 import "./interfaces/IOutcomeToken.sol";
@@ -15,12 +16,16 @@ interface IBFactory {
 interface IOracle {
 }
 
+interface IFlashLoanReceiver {
+    function onFlashLoan(uint256 amount) external;
+}
 
 
 
 contract SpamPredictionMarket {
     uint constant MAX_UINT = 2**256 - 1;
     uint constant BALANCER_MIN_BALANCE = 10**6; // 10**18 / 10**12
+    uint constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
 
     enum MARKET_STATUS {
         INITIALIZING,
@@ -35,12 +40,12 @@ contract SpamPredictionMarket {
     event Finalized(uint finalOutcome);
     event SharesRedeemed(address user, uint amount);
     
-    IBFactory bFactory;
+    IUniswapV2Factory public uniswapFactory;
     Factory factory;
     IBPool public pool;
     IERC20 public collateralToken;
     IOracle public oracle;
-    IOutcomeToken[] public outcomeTokens;
+    IOutcomeToken[2] public outcomeTokens;
 
     uint8 marketState = uint8(MARKET_STATUS.INITIALIZING);
     uint8 finalOutcome = 0;
@@ -63,14 +68,14 @@ contract SpamPredictionMarket {
     constructor(
         address _oracle,
         address _collateralToken,
-        address _bFactory,
+        address _uniswapFactory,
         address _factory
     ) 
         public
     {
         oracle = IOracle(_oracle);
         collateralToken = IERC20(_collateralToken);
-        bFactory = IBFactory(_bFactory);
+        uniswapFactory = IUniswapV2Factory(_uniswapFactory);
         factory = Factory(_factory);
     }
 
@@ -79,9 +84,12 @@ contract SpamPredictionMarket {
         isInitializing 
     {
         // Create outcome tokens.
-        outcomeTokens = new OutcomeToken[](2);
         outcomeTokens[0] = OutcomeToken(factory.newOutcomeToken("Not Spam", "NOT-SPAM", address(this)));
         outcomeTokens[1] = OutcomeToken(factory.newOutcomeToken("Spam", "SPAM", address(this)));
+
+        // Create Uniswap pairs.
+        uniswapFactory.createPair(address(this.collateralToken()), address(outcomeTokens[0]));
+        uniswapFactory.createPair(address(this.collateralToken()), address(outcomeTokens[1]));
 
         marketState = uint8(MARKET_STATUS.OPEN);
         emit Initialized();
@@ -98,38 +106,38 @@ contract SpamPredictionMarket {
         require(address(pool) == address(0), "createPool can only be called once");
 
         // Create pool.
-        pool = IBPool(address(bFactory.newBPool()));
+        // pool = IBPool(address(bFactory.newBPool()));
         
         // Approve.
         collateralToken.approve(address(pool), MAX_UINT);
         spamToken().approve(address(pool), MAX_UINT);
         notSpamToken().approve(address(pool), MAX_UINT);
 
-        require(
-            collateralToken.balanceOf(creator) >= BALANCER_MIN_BALANCE,
-            "collateralToken balance must be greater than 10**6"
-        );
-        require(
-            spamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
-            "spamToken balance must be greater than 10**6"
-        );
-        require(
-            notSpamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
-            "notSpamToken balance must be greater than 10**6"
-        );
+        // require(
+        //     collateralToken.balanceOf(creator) >= BALANCER_MIN_BALANCE,
+        //     "collateralToken balance must be greater than 10**6"
+        // );
+        // require(
+        //     spamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
+        //     "spamToken balance must be greater than 10**6"
+        // );
+        // require(
+        //     notSpamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
+        //     "notSpamToken balance must be greater than 10**6"
+        // );
 
         collateralToken.transferFrom(creator, address(this), amounts[0]); 
         spamToken().transferFrom(creator, address(this), amounts[1]);
         notSpamToken().transferFrom(creator, address(this), amounts[2]);
         
         // Bind the pool tokens.
-        pool.bind(address(collateralToken), collateralToken.balanceOf(address(this)), outcomeTokens.length * 10**18);
-        for(uint i = 0; i < outcomeTokens.length; i++) {
-            pool.bind(address(outcomeTokens[i]), outcomeTokens[i].balanceOf(address(this)), 1 * 10**18);
-        }
+        // pool.bind(address(collateralToken), collateralToken.balanceOf(address(this)), outcomeTokens.length * 10**18);
+        // for(uint i = 0; i < outcomeTokens.length; i++) {
+        //     pool.bind(address(outcomeTokens[i]), outcomeTokens[i].balanceOf(address(this)), 1 * 10**18);
+        // }
 
-        pool.setPublicSwap(true);
-        pool.finalize();
+        // pool.setPublicSwap(true);
+        // pool.finalize();
 
         // Transfer LP share to creator.
         pool.transferFrom(address(this), msg.sender, pool.balanceOf(address(this)));
@@ -174,6 +182,24 @@ contract SpamPredictionMarket {
         }
         collateralToken.transferFrom(address(this), msg.sender, amount);
         emit SharesSold(msg.sender, amount);
+    }
+
+    function flashloan(
+        address receiver,
+        uint amount
+    )
+        public
+        isOpen 
+    {
+        for(uint i = 0; i < outcomeTokens.length; i++) {
+            outcomeTokens[i].mint(receiver, amount);
+        }
+
+        IFlashLoanReceiver(receiver).onFlashLoan(amount);
+
+        for(uint i = 0; i < outcomeTokens.length; i++) {
+            outcomeTokens[i].burn(receiver, amount);
+        }
     }
 
     // function report(uint8 _finalOutcome) 
@@ -254,5 +280,13 @@ contract SpamPredictionMarket {
         returns (IOutcomeToken)
     {
         return outcomeTokens[1];
+    }
+
+    function getOutcomeTokens()
+        external
+        view
+        returns (IOutcomeToken[2] memory)
+    {
+        return outcomeTokens;
     }
 }

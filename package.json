@@ -4,7 +4,8 @@
   "scripts": {
     "test:create-market": "yarn hardhat run scripts/create-market-fpmm.ts",
     "deploy": "yarn hardhat run scripts/deploy.ts",
-    "node:kovan": "yarn hardhat node"
+    "node:forked": "HARDHAT_NETWORK=hardhat yarn hardhat node",
+    "node": "yarn hardhat node"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
@@ -12,8 +13,10 @@
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.20",
-    "chai": "^4.2.0",
-    "ethereum-waffle": "^3.0.0",
+    "@types/promise.allsettled": "^1.0.3",
+    "@uniswap/sdk": "^3.0.3",
+    "chai": "^4.3.0",
+    "ethereum-waffle": "^3.2.2",
     "ethers": "5.0.25",
     "hardhat": "2.0.10",
     "hardhat-contract-sizer": "^2.0.2",
@@ -27,6 +30,8 @@
     "@gnosis.pm/conditional-tokens-market-makers": "^1.8.1",
     "@openzeppelin/contracts": "^3.4.0",
     "@realitio/realitio-lib": "^2.0.2",
+    "@uniswap/v2-core": "^1.0.1",
+    "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "hardhat-abi-exporter": "^2.0.8",
     "ipfs-core": "^0.5.1"
   }

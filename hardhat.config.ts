@@ -2,7 +2,7 @@ import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-waffle";
 import 'hardhat-abi-exporter'
 import 'hardhat-contract-sizer'
-
+import "@nomiclabs/hardhat-waffle"
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -32,7 +32,7 @@ export default {
         version: "0.5.5"
       },
       {
-        version: "0.6.4"
+        version: "0.6.6"
       },
       {
         version: "0.7.0"

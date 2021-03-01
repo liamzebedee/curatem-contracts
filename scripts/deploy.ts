@@ -41,16 +41,10 @@ async function main() {
     }
     const moderatorArbitrator = await ModeratorArbitrator.deploy(REALITYIO_ADDRESS, JSON.stringify(metadata));
     contracts['ModeratorArbitrator'] = moderatorArbitrator
-
     const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
     
-
-    // 1. Deploy Resolver.
-    // const AddressResolver = await hre.ethers.getContractFactory("AddressResolver");
-    // const addressResolver = await AddressResolver.deploy()
-    // contracts['AddressResolver'] = addressResolver
     
-    // // 1a. Import vendor addresses.
+    // 1a. Import vendor addresses.
     const {
       Realitio,
       RealitioProxy,
@@ -66,22 +60,6 @@ async function main() {
     })
     console.log()
 
-    // const names = [
-    //   'Realitio',
-    //   'RealitioProxy',
-    //   'ConditionalTokens',
-    //   'FPMMDeterministicFactory',
-    //   'WETH9'
-    // ]
-    // const destinations = [
-    //   Realitio,
-    //   RealitioProxy,
-    //   ConditionalTokens,
-    //   FPMMDeterministicFactory,
-    //   WETH9
-    // ]
-    // await addressResolver.importAddresses(names, destinations)
-
 
     // 1a. Deploy libraries.
     const CTHelpers = await hre.ethers.getContractFactory("CTHelpers");
@@ -91,10 +69,6 @@ async function main() {
     const scripts = await Scripts.deploy()
     contracts['Scripts'] = scripts
     
-    // const LibFactory = await hre.ethers.getContractFactory("LibFactory");
-    // const libfactory = await LibFactory.deploy()
-    // contracts['LibFactory'] = libfactory
-
     const libraries = {
       "CTHelpers": ctHelpers.address,
     }
@@ -184,6 +158,10 @@ async function main() {
       }
     }
     
+    if(process.env.DRY_DEPLOY) {
+      console.log(`DRY_DEPLOY is enabled. Deployments have not been saved.`)
+      return
+    }
     writeFileSync(DEPLOYMENTS_PATH, JSON.stringify(deployments, null, 4))
 }
 

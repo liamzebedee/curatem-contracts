@@ -31,7 +31,7 @@ contract Curatem {
         bytes32 salt,
         address _token,
         address _moderator,
-        address _bFactory,
+        address _uniswapFactory,
         address _factory
     ) public returns (address) {
         CuratemCommunity community = new CuratemCommunity(
@@ -39,7 +39,7 @@ contract Curatem {
             realityIoGnosisProxy,
             conditionalTokens,
             fpmmFactory,
-            _bFactory,
+            _uniswapFactory,
             _factory,
             _token, 
             msg.sender

@@ -47,7 +47,7 @@ abstract class ContractResolver {
     resolve(contract) {
       let data: any
       try {
-        data = this.deployments[this.networkId][contract]
+        data = this.deployments[this.networkId][contract].address
       } catch(ex) {
         throw new Error(`Could not resolve contract ${contract} from deployments: ${ex.toString()}`)
       }
@@ -66,16 +66,18 @@ abstract class ContractResolver {
     let networkId: number
     let network = await provider.getNetwork()
     networkId = network.chainId
-    console.log(networkId)
+    // console.log(networkId)
   
     let resolver: ContractResolver
     let resolver2: ContractResolver
+    let resolver3: ContractResolver
     
     if(networkId == 31337 || networkId == 42) {
       // This is a development network.
       // Load the addresses from the build artifacts.
       resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts'))
       resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts'))
+      resolver3 = new DeploymentsJsonResolver(networkId, '../deployments.json')
     } else {
       console.warn(`Network ${networkId} not configured with contracts for resolution`)
       return {}
@@ -91,6 +93,10 @@ abstract class ContractResolver {
     const balancerContracts = [
       'BFactory'
     ]
+    const deployments = [
+      'UniswapV2Factory',
+      'UniswapV2Router02'
+    ]
 
     function resolveWithResolver(contracts: string[], resolver: ContractResolver) {
       return contracts
@@ -99,11 +105,25 @@ abstract class ContractResolver {
           return addresses
         }, {})
     }
-    
-    return {
+
+    const resolvedContracts = {
       ...resolveWithResolver(omenContracts, resolver),
-      ...resolveWithResolver(balancerContracts, resolver2)
-    }   
+      ...resolveWithResolver(balancerContracts, resolver2),
+      ...resolveWithResolver(deployments, resolver3)
+    }
+    const contractsToSanityCheck = Object.keys(resolvedContracts)
+    await Promise.allSettled(
+      contractsToSanityCheck.map(async contractName => {
+        // Call getCode.
+        const addr = resolvedContracts[contractName]
+        const code = await provider.getCode(addr)
+        if(code == '0x') {
+          console.error(`Contract ${contractName} at ${addr} has no deployed code. Did you forget to deploy it?`)
+        }
+      })
+    )
+    
+    return resolvedContracts
 }
 
 
