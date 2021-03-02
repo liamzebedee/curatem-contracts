@@ -17,6 +17,7 @@ const DEPLOYMENTS_PATH = join(__dirname, '../deployments.json')
 async function main() {
   let network = await hre.ethers.provider.getNetwork()
   let networkId = network.chainId
+  console.log(`Deploying for network ID ${networkId}`)
   let provider = hre.ethers.provider
 
   const vendoredContracts = await resolveContracts(provider)
@@ -51,7 +52,7 @@ async function main() {
       ConditionalTokens,
       FPMMDeterministicFactory,
       WETH9,
-      BFactory
+      UniswapV2Factory
     } = vendoredContracts
 
     console.log(`Vendored addresses:`)
@@ -62,15 +63,15 @@ async function main() {
 
 
     // 1a. Deploy libraries.
-    const CTHelpers = await hre.ethers.getContractFactory("CTHelpers");
-    const ctHelpers = await CTHelpers.deploy()
+    // const CTHelpers = await hre.ethers.getContractFactory("CTHelpers");
+    // const ctHelpers = await CTHelpers.deploy()
 
     const Scripts = await hre.ethers.getContractFactory("Scripts");
     const scripts = await Scripts.deploy()
     contracts['Scripts'] = scripts
     
     const libraries = {
-      "CTHelpers": ctHelpers.address,
+      // "CTHelpers": ctHelpers.address,
     }
 
     // Deploy the factories.
@@ -127,7 +128,7 @@ async function main() {
         salt,
         community.token, 
         community.moderator,
-        BFactory,
+        UniswapV2Factory,
         factory.address
       )
       const receipt = await txResponse.wait()

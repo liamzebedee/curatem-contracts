@@ -42,7 +42,7 @@ contract Curatem {
             _uniswapFactory,
             _factory,
             _token, 
-            msg.sender
+            _moderator
         );
         
         emit NewCommunity(address(community));

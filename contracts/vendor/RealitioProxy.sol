@@ -1,7 +1,7 @@
 
 
-import "./interfaces/IRealitio.sol";
-import "./interfaces/IPredictionMarket.sol";
+import "../interfaces/IRealitio.sol";
+import "../interfaces/IPredictionMarket.sol";
 
 
 contract RealitioProxy {

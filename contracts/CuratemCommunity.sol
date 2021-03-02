@@ -125,9 +125,6 @@ contract CuratemCommunity {
         );
         market.initialize();
 
-        // Allow market to call transferFrom on these tokens.
-        // token.approve(market, MAX_UINT);
-
         emit NewSpamPredictionMarket(hashDigest, questionId, address(market));
         return address(market);
     }

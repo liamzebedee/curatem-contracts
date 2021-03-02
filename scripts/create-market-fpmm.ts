@@ -284,16 +284,16 @@ async function main() {
 
   // await scripts.buyAndCreatePool(market, toWei('2'), toWei('2'))
   
-  const spamTokenAddress = (await predictionMarket.spamToken())
-  const notSpamTokenAddress = (await predictionMarket.notSpamToken())
-  await scripts.buyCreatePoolAndKeepOneOutcome(market, toWei('1'), toWei('1'), spamTokenAddress)
+  // const spamTokenAddress = (await predictionMarket.spamToken())
+  // const notSpamTokenAddress = (await predictionMarket.notSpamToken())
+  // await scripts.buyCreatePoolAndKeepOneOutcome(market, toWei('1'), toWei('1'), spamTokenAddress)
   
-  const spamToken = new ethers.Contract(spamTokenAddress, erc20Abi, signer)
-  const notSpamToken = new ethers.Contract(notSpamTokenAddress, erc20Abi, signer)
-  console.log(
-    (await spamToken.balanceOf(await signer.getAddress())).toString(),
-    (await notSpamToken.balanceOf(await signer.getAddress())).toString()
-  )
+  // const spamToken = new ethers.Contract(spamTokenAddress, erc20Abi, signer)
+  // const notSpamToken = new ethers.Contract(notSpamTokenAddress, erc20Abi, signer)
+  // console.log(
+  //   (await spamToken.balanceOf(await signer.getAddress())).toString(),
+  //   (await notSpamToken.balanceOf(await signer.getAddress())).toString()
+  // )
 
   
   // {
