@@ -13,7 +13,7 @@
       },
       {
         "internalType": "address",
-        "name": "_bFactory",
+        "name": "_uniswapFactory",
         "type": "address"
       },
       {
@@ -160,6 +160,24 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "flashloan",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getOutcome",
     "outputs": [
@@ -169,7 +187,20 @@
         "type": "uint8"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getOutcomeTokens",
+    "outputs": [
+      {
+        "internalType": "contract IOutcomeToken[2]",
+        "name": "",
+        "type": "address[2]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -197,7 +228,7 @@
     "name": "oracle",
     "outputs": [
       {
-        "internalType": "contract IOracle",
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -287,6 +318,19 @@
     "outputs": [
       {
         "internalType": "contract IOutcomeToken",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uniswapFactory",
+    "outputs": [
+      {
+        "internalType": "contract IUniswapV2Factory",
         "name": "",
         "type": "address"
       }

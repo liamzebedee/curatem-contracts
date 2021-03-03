@@ -57,7 +57,7 @@
       },
       {
         "internalType": "address",
-        "name": "_bFactory",
+        "name": "_uniswapFactory",
         "type": "address"
       },
       {

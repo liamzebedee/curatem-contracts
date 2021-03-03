@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "test:create-market": "yarn hardhat run scripts/create-market-fpmm.ts",
+    "test:setup-metamask": "yarn hardhat run scripts/metamask.ts",
     "deploy": "yarn hardhat run scripts/deploy.ts",
     "node:forked": "HARDHAT_NETWORK=hardhat yarn hardhat node",
     "node": "yarn hardhat node"

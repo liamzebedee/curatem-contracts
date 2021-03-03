@@ -184,6 +184,7 @@ contract SpamPredictionMarket {
         emit SharesSold(msg.sender, amount);
     }
 
+    // TODO: use ERC3156
     function flashloan(
         address receiver,
         uint amount

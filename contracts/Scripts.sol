@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import '@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol';
 
+import "hardhat/console.sol";
 
 contract Scripts {
     uint constant MAX_UINT = 2**256 - 1;
@@ -127,10 +128,13 @@ contract Scripts {
 
     struct buyOutcomeElseProvideLiquidity_vars {
         uint collateralTokenInAmount;
+        uint buyAmount;
         IOutcomeToken x_token;
         IOutcomeToken notX_token;
         IERC20 collateralToken;
         uint ammTokenInAmount;
+        uint xAmount;
+        uint notXAmount;
     }
 
     function buyOutcomeElseProvideLiquidity(
@@ -152,6 +156,7 @@ contract Scripts {
         // Parameters.
         buyOutcomeElseProvideLiquidity_vars memory vars;
         vars.collateralTokenInAmount = buyAmount;
+        vars.buyAmount = buyAmount / 2;
 
         ISpamPredictionMarket market = ISpamPredictionMarket(_market);
         IERC20(market.collateralToken()).transferFrom(msg.sender, address(this), vars.collateralTokenInAmount);
@@ -176,15 +181,19 @@ contract Scripts {
                 address(vars.collateralToken),
                 address(vars.x_token)
             );
+            console.log("reserves %s %s", reserveA, reserveB);
+
             // TODO: could probably move this into an internal function flow.
-            if(reserveA == 0) {
+            if(reserveA == 0 
+                || reserveB == 0
+                || vars.buyAmount >= reserveB) {
                 vars.ammTokenInAmount = MAX_UINT;
             } else {
-                vars.ammTokenInAmount = uniswapRouter.getAmountIn(buyAmount, reserveA, reserveB);
+                vars.ammTokenInAmount = uniswapRouter.getAmountIn(vars.buyAmount, reserveA, reserveB);
             }
         }
 
-        // 2. If AMM price was cheaper than minting outcome tokens.
+        // 2. If AMM price was cheaper than minting outcome tokens, then buy from AMM.
         // NOTE: exchange rate is 1:1 from minting outcome shares, so
         // we reuse collateralTokenInAmount here.
         if(vars.ammTokenInAmount < vars.collateralTokenInAmount) {
@@ -195,7 +204,7 @@ contract Scripts {
             path[1] = address(vars.x_token);
             uniswapRouter.swapExactTokensForTokens(
                 vars.ammTokenInAmount,
-                buyAmount,
+                vars.buyAmount,
                 path,
                 msg.sender,
                 block.timestamp
@@ -204,7 +213,7 @@ contract Scripts {
 
         } else {
 
-            // Provide liquidity in the form of SubredditToken to AMM with probability skewed to “Spam”.
+            // Else, provide liquidity in the form of SubredditToken to AMM with probability skewed to “Spam”.
             // Collateral is split across two transactions:
             // (1) odds % is sent to mint outcome shares.
             // (2) (1 - odds) % is deposited as liquidity in the Uniswap pool. 
@@ -213,26 +222,40 @@ contract Scripts {
             // outcomeOddsNumerator = 4
             // outcomeOddsDenominator = 5
             // to 1.0 * (4/5) = 0.8
-
-            // odds = 90%
-            // betAmount = 0.9 REP
-            // liquidityAmount = 0.1 REP
             
-            uint betAmount =       vars.collateralTokenInAmount * outcomeOddsNumerator / outcomeOddsDenominator;
-            uint liquidityAmount = vars.collateralTokenInAmount - betAmount;
+            // Deposit 50% REP to mint outcome shares.
+            // Use 50% of REP to provide liquidity.
+            // 50% * betAmount REP
+            // -> 50% * 10% = 0.05 REP + notX shares
+            // -> 50% * 90% = 0.45 REP +    X shares
+            uint liquidityAmount = (vars.collateralTokenInAmount / 2);
+            vars.xAmount = liquidityAmount * outcomeOddsNumerator / outcomeOddsDenominator;
+            vars.notXAmount = liquidityAmount - vars.xAmount;
 
-            vars.collateralToken.approve(address(market), vars.collateralTokenInAmount);
-            market.buy(betAmount);
+            vars.collateralToken.approve(address(market), liquidityAmount);
+            market.buy(liquidityAmount);
             
             // Sell the notX_token to the Uniswap pool.
             vars.collateralToken.approve(address(uniswapRouter), liquidityAmount);
-            vars.notX_token.approve(address(uniswapRouter), betAmount);
+            vars.x_token.approve(address(uniswapRouter), liquidityAmount);
+            vars.notX_token.approve(address(uniswapRouter), liquidityAmount);
 
             uniswapRouter.addLiquidity(
                 address(vars.collateralToken),
                 address(vars.notX_token),
+                vars.notXAmount,
                 liquidityAmount,
-                betAmount,
+                amountAMin,
+                amountBMin,
+                msg.sender,
+                block.timestamp + 1
+            );
+
+            uniswapRouter.addLiquidity(
+                address(vars.collateralToken),
+                address(vars.x_token),
+                vars.xAmount,
+                liquidityAmount,
                 amountAMin,
                 amountBMin,
                 msg.sender,

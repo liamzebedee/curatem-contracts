@@ -23,7 +23,7 @@
       },
       {
         "internalType": "address",
-        "name": "_bFactory",
+        "name": "_uniswapFactory",
         "type": "address"
       },
       {
@@ -124,30 +124,6 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "conditionId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "outcome",
-        "type": "uint256"
-      }
-    ],
-    "name": "getPositionToken",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
         "name": "digest",
         "type": "bytes32"
       }
@@ -198,25 +174,6 @@
   {
     "inputs": [
       {
-        "internalType": "bytes32",
-        "name": "conditionId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "notSpamToken",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "uint32",
         "name": "_timeoutResolution",
         "type": "uint32"
@@ -225,25 +182,6 @@
     "name": "setTimeout",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "conditionId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "spamToken",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

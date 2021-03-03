@@ -12,12 +12,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "liquidityAmount",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "outcomeToken",
+        "type": "address"
       }
     ],
-    "name": "buyAndCreatePool",
+    "name": "buy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -46,6 +46,54 @@
       }
     ],
     "name": "buyCreatePoolAndKeepOneOutcome",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_market",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "outcome",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint256",
+        "name": "buyAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "outcomeOddsNumerator",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "outcomeOddsDenominator",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_uniswapRouterV2",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountAMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountBMin",
+        "type": "uint256"
+      }
+    ],
+    "name": "buyOutcomeElseProvideLiquidity",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -144,33 +144,9 @@ interface ContractAddresses {
 
 import { join } from 'path'
 import { ethers } from 'ethers'
+import { resolveContracts } from './resolver'
 
-async function resolveContracts(provider: ethers.providers.Provider): Promise<ContractAddresses> {
-  let networkId: number
-  let network = await provider.getNetwork()
-  networkId = network.chainId
-  console.log(networkId)
 
-  let resolver: ContractResolver
-  
-  // This is a development network.
-  // Load the addresses from the build artifacts.
-  resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts/'))
-
-  const contracts = [
-    'Realitio',
-    'RealitioProxy',
-    'ConditionalTokens',
-    'FPMMDeterministicFactory',
-    'WETH9'
-  ]
-  
-  return contracts
-    .reduce((addresses: ContractAddresses, contract: string) => {
-      addresses[contract] = resolver.resolve(contract)
-      return addresses
-    }, {})
-}
 
 const IFixedProductMarketMakerJSON = require('../abis/IFixedProductMarketMaker.json')
 

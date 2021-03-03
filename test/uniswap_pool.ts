@@ -112,8 +112,8 @@ describe("Uniswap pool", function() {
       )
 
       let [notSpamToken, spamToken] = await market.getOutcomeTokens()
-      const spam = new Token(ChainId.KOVAN, spamToken, 18, 'NOT-SPAM')
-      const rep = new Token(ChainId.KOVAN, collateralToken, 18, 'WETH')
+      const spam = new Token(ChainId.KOVAN, spamToken, 18)
+      const rep = new Token(ChainId.KOVAN, collateralToken, 18)
 
       const pair = await Fetcher.fetchPairData(spam, rep, provider)
       expect(pair.reserveOf(spam).toFixed(5)).to.eq('1.80000')
@@ -125,8 +125,8 @@ describe("Uniswap pool", function() {
       const outcome = '1' // spam
 
       let [notSpamToken, spamToken] = await market.getOutcomeTokens()
-      const spam = new Token(ChainId.KOVAN, spamToken, 18, 'NOT-SPAM')
-      const rep = new Token(ChainId.KOVAN, collateralToken, 18, 'WETH')
+      const spam = new Token(ChainId.KOVAN, spamToken, 18)
+      const rep = new Token(ChainId.KOVAN, collateralToken, 18)
       let pair = await Fetcher.fetchPairData(spam, rep, provider)
       const [amount, ] = pair.getInputAmount(new TokenAmount(spam, buyAmount.toString()))
       expect(amount.toFixed(18)).to.eq('0.077154540544711057')
@@ -149,6 +149,54 @@ describe("Uniswap pool", function() {
       pair = await Fetcher.fetchPairData(spam, rep, provider)
       expect(pair.reserveOf(spam).toFixed(5)).to.eq('1.29999')
       expect(pair.reserveOf(rep).toFixed(5)).to.eq('0.27715')
+    })
+
+    it('checks if buy amount is larger than reserves', async () => {
+      const buyAmount = toWei('1')
+      const OUTCOME_NOTSPAM = '0'
+      const OUTCOME_SPAM = '1'
+
+      let [notSpamToken, spamToken] = await market.getOutcomeTokens()
+      const spam = new Token(ChainId.KOVAN, spamToken, 18)
+      const notSpam = new Token(ChainId.KOVAN, notSpamToken, 18)
+      const rep = new Token(ChainId.KOVAN, collateralToken, 18)
+      
+      // First buy some NOTSPAM.
+      // This creates the SPAM-REP pool.
+      await scripts.buyOutcomeElseProvideLiquidity(
+        market.address,
+        OUTCOME_NOTSPAM,
+        buyAmount,
+        '9',  
+        '10',
+        UniswapV2Router02,
+        '10000',
+        '10000'
+      )
+
+      // Log reserves of each pool.
+      let pairSpam = await Fetcher.fetchPairData(spam, rep, provider)
+      let pairNotSpam = await Fetcher.fetchPairData(notSpam, rep, provider)
+      console.log(
+        [pairSpam.reserve0, pairSpam.reserve1].map(x => x.toFixed(5))
+      )
+      console.log(
+        [pairNotSpam.reserve0, pairNotSpam.reserve1].map(x => x.toFixed(5))
+      )
+
+      // Now buy some SPAM.
+      // This will try to go through the newly-created SPAM pool,
+      // but buyAmount will be larger than the reserves of 0.1 SPAM.
+      await scripts.buyOutcomeElseProvideLiquidity(
+        market.address,
+        OUTCOME_SPAM,
+        buyAmount,
+        '9',  
+        '10',
+        UniswapV2Router02,
+        '10000',
+        '10000'
+      )
     })
   })
 })
