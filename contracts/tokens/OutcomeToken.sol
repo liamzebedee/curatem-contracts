@@ -12,6 +12,7 @@ contract OutcomeToken is ERC20, Owned, IOutcomeToken, Initializable {
 
     string private _name;
     string private _symbol;
+    uint8 private _decimals;
 
     constructor() 
         public 
@@ -28,10 +29,9 @@ contract OutcomeToken is ERC20, Owned, IOutcomeToken, Initializable {
         public 
         uninitialized
     {
-        // ERC20(name, ticker) 
         _name = name;
         _symbol = ticker;
-        // Owned(_predictionMarket) 
+        _decimals = 18;
         owner = _predictionMarket;
     }
 
@@ -67,6 +67,10 @@ contract OutcomeToken is ERC20, Owned, IOutcomeToken, Initializable {
         returns (string memory)
     {
         return _symbol;
+    }
+    
+    function decimals() public view override returns (uint8) {
+        return _decimals;
     }
 
     // function allowance(address owner, address spender) 
