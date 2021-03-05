@@ -54,13 +54,13 @@ describe("Uniswap pool", function() {
       const oracle = '0x0000000000000000000000000000000000000000'
       collateralToken = weth.address
       
-      market = await SpamPredictionMarket.deploy(
+      market = await SpamPredictionMarket.deploy()
+      await market.initialize(
         oracle,
         collateralToken,
         UniswapV2Factory,
         factory.address
       )
-      await market.initialize()
       
       // Deploy Scripts.
       scripts = await Scripts.deploy()

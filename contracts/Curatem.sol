@@ -30,11 +30,13 @@ contract Curatem {
     function createCommunity(
         bytes32 salt,
         address _token,
-        address _moderator,
+        address _moderatorArbitrator,
         address _uniswapFactory,
         address _factory
     ) public returns (address) {
         CuratemCommunity community = new CuratemCommunity(
+        );
+        community.initialize(
             realitio,
             realityIoGnosisProxy,
             conditionalTokens,
@@ -42,7 +44,7 @@ contract Curatem {
             _uniswapFactory,
             _factory,
             _token, 
-            _moderator
+            _moderatorArbitrator
         );
         
         emit NewCommunity(address(community));

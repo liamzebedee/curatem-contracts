@@ -9,18 +9,9 @@ import "./interfaces/IOutcomeToken.sol";
 import "./tokens/OutcomeToken.sol";
 import "./factories/Factory.sol";
 
-// interface IBFactory {
-//     function newBPool() external returns (address);
-// }
-
-// interface IOracle {
-// }
-
 interface IFlashLoanReceiver {
     function onFlashLoan(uint256 amount) external;
 }
-
-
 
 contract SpamPredictionMarket {
     uint constant MAX_UINT = 2**256 - 1;
@@ -65,24 +56,25 @@ contract SpamPredictionMarket {
         _;
     }
 
-    constructor(
+    constructor() 
+        public
+    {
+    }
+
+    function initialize(
         address _oracle,
         address _collateralToken,
         address _uniswapFactory,
         address _factory
     ) 
-        public
+        public 
+        isInitializing 
     {
         oracle = _oracle;
         collateralToken = IERC20(_collateralToken);
         uniswapFactory = IUniswapV2Factory(_uniswapFactory);
         factory = Factory(_factory);
-    }
-
-    function initialize() 
-        public 
-        isInitializing 
-    {
+        
         // Create outcome tokens.
         outcomeTokens[0] = OutcomeToken(factory.newOutcomeToken("Not Spam", "NOT-SPAM", address(this)));
         outcomeTokens[1] = OutcomeToken(factory.newOutcomeToken("Spam", "SPAM", address(this)));
@@ -102,48 +94,6 @@ contract SpamPredictionMarket {
         isOpen
         returns (address)
     {
-        address creator = msg.sender;
-        require(address(pool) == address(0), "createPool can only be called once");
-
-        // Create pool.
-        // pool = IBPool(address(bFactory.newBPool()));
-        
-        // Approve.
-        collateralToken.approve(address(pool), MAX_UINT);
-        spamToken().approve(address(pool), MAX_UINT);
-        notSpamToken().approve(address(pool), MAX_UINT);
-
-        // require(
-        //     collateralToken.balanceOf(creator) >= BALANCER_MIN_BALANCE,
-        //     "collateralToken balance must be greater than 10**6"
-        // );
-        // require(
-        //     spamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
-        //     "spamToken balance must be greater than 10**6"
-        // );
-        // require(
-        //     notSpamToken().balanceOf(creator) >= BALANCER_MIN_BALANCE,
-        //     "notSpamToken balance must be greater than 10**6"
-        // );
-
-        collateralToken.transferFrom(creator, address(this), amounts[0]); 
-        spamToken().transferFrom(creator, address(this), amounts[1]);
-        notSpamToken().transferFrom(creator, address(this), amounts[2]);
-        
-        // Bind the pool tokens.
-        // pool.bind(address(collateralToken), collateralToken.balanceOf(address(this)), outcomeTokens.length * 10**18);
-        // for(uint i = 0; i < outcomeTokens.length; i++) {
-        //     pool.bind(address(outcomeTokens[i]), outcomeTokens[i].balanceOf(address(this)), 1 * 10**18);
-        // }
-
-        // pool.setPublicSwap(true);
-        // pool.finalize();
-
-        // Transfer LP share to creator.
-        pool.transferFrom(address(this), msg.sender, pool.balanceOf(address(this)));
-
-        emit PoolCreated(address(pool));
-        return address(pool);
     }
 
     function buy(uint amount) 

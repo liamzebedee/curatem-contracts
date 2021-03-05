@@ -6,6 +6,7 @@ import "./vendor/CTHelpers.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 //x import "@gnosis.pm/conditional-tokens-market-makers/contracts/FixedProductMarketMaker.sol";
 import "./SpamPredictionMarket.sol";
+import "./ModeratorArbitrator.sol";
 
 
 interface IFPMMDeterministicFactory {
@@ -22,7 +23,7 @@ interface IFPMMDeterministicFactory {
 
 contract CuratemCommunity {
     IERC20 public token;
-    address public moderator;
+    ModeratorArbitrator public moderatorArbitrator;
     mapping(bytes32 => string) public itemUrlForDigest;
 
     event MarketCreated(bytes32 hashDigest, bytes32 conditionId, bytes32 questionId, address fixedProductMarketMaker);
@@ -41,6 +42,12 @@ contract CuratemCommunity {
     uint constant MAX_UINT = 2**256 - 1;
 
     constructor(
+    ) 
+        public 
+    {   
+    }
+
+    function initialize(
         address _realitio,
         address _realityIoGnosisProxy,
         address _conditionalTokens,
@@ -48,9 +55,9 @@ contract CuratemCommunity {
         address _uniswapFactory,
         address _factory,
         address _token,
-        address _moderator
-    ) 
-        public 
+        address _moderatorArbitrator
+    )
+        public
     {
         realitio = IRealitio(_realitio);
         realityIoGnosisProxy = _realityIoGnosisProxy;
@@ -60,7 +67,8 @@ contract CuratemCommunity {
         uniswapFactory = _uniswapFactory;
 
         token = IERC20(_token);
-        moderator = _moderator;
+        moderatorArbitrator = ModeratorArbitrator(_moderatorArbitrator);
+        require(address(moderatorArbitrator.realitio()) == _realitio, "ERR_MODERATOR_ARBITRATOR_REALITIO");
     }
 
 
@@ -70,7 +78,6 @@ contract CuratemCommunity {
         external returns (address) 
     {
         return createPredictionMarket(url);
-        // return createGnosisMarket(url);
     }
 
     struct QuestionIdVars {
@@ -100,8 +107,8 @@ contract CuratemCommunity {
             template_id: 2,
             // "Is this spam? https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
             question: string(abi.encodePacked(
-                "Is this spam?", REALITIO_UNICODE_SEPERATOR, "\"Spam\",\"Not spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
-            arbitrator: moderator,
+                "Is this spam? - ", url, REALITIO_UNICODE_SEPERATOR, "\"Not Spam\",\"Spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
+            arbitrator: address(moderatorArbitrator),
             timeout: timeoutResolution,
             opening_ts: uint32(block.timestamp),
             nonce: uint256(hashDigest),
@@ -117,13 +124,13 @@ contract CuratemCommunity {
             questionId_vars.opening_ts, 
             questionId_vars.nonce);
         
-        SpamPredictionMarket market = new SpamPredictionMarket(
+        SpamPredictionMarket market = new SpamPredictionMarket();
+        market.initialize(
             questionId_vars.oracle,
             address(token),
             uniswapFactory,
             factory
         );
-        market.initialize();
 
         emit NewSpamPredictionMarket(hashDigest, questionId, address(market));
         return address(market);

@@ -2,9 +2,6 @@
 import * as hre from 'hardhat'
 import '@nomiclabs/hardhat-ethers'
 
-const {
-  REALITYIO_ADDRESS
-} = process.env
 
 import { writeFileSync } from 'fs'
 import { join } from 'path'
@@ -26,24 +23,6 @@ async function main() {
     [key: string]: Contract
   } = {}
     
-    // Hardhat always runs the compile task when running scripts with its command
-    // line interface.
-    //
-    // If this script is run directly using `node` you may want to call compile 
-    // manually to make sure everything is compiled
-    // await hre.run('compile');
-  
-    // Deploy contracts.
-    const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
-    // TODO
-    const metadata = {
-        tos: "https://twitter.com/liamzebedee",
-        template_hashes: []
-    }
-    const moderatorArbitrator = await ModeratorArbitrator.deploy(REALITYIO_ADDRESS, JSON.stringify(metadata));
-    contracts['ModeratorArbitrator'] = moderatorArbitrator
-    const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
-    
     
     // 1a. Import vendor addresses.
     const {
@@ -60,6 +39,17 @@ async function main() {
       console.log(`${name},${address}`)
     })
     console.log()
+
+
+    const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
+    // TODO
+    const metadata = {
+        tos: "https://twitter.com/liamzebedee",
+        template_hashes: []
+    }
+    const moderatorArbitrator = await ModeratorArbitrator.deploy(Realitio, JSON.stringify(metadata));
+    contracts['ModeratorArbitrator'] = moderatorArbitrator
+    const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
 
 
     // 1a. Deploy libraries.
