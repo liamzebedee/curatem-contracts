@@ -53,18 +53,14 @@ async function main() {
 
 
     // 1a. Deploy libraries.
-    // const CTHelpers = await hre.ethers.getContractFactory("CTHelpers");
-    // const ctHelpers = await CTHelpers.deploy()
-
     const Scripts = await hre.ethers.getContractFactory("Scripts");
     const scripts = await Scripts.deploy()
     contracts['Scripts'] = scripts
     
     const libraries = {
-      // "CTHelpers": ctHelpers.address,
     }
 
-    // Deploy the factories.
+    // Setup bytecode for cloning.
     const Factory = await hre.ethers.getContractFactory(
       "Factory",
       {

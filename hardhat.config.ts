@@ -38,21 +38,18 @@ export default {
         version: "0.7.0"
       }
     ],
-    // overrides: {
-    //   "contracts/vendor/CTHelpers.sol": {
-    //     version: "0.5.5",
-    //     settings: { }
-    //   }
-    // }
   },
+  
+  // Default network is set to development.
+  // Development will connect to the forked Hardhat node.
   defaultNetwork: "development",
 
   networks: {
     hardhat: {
       chainId: 42,
       forking: {
-        url: process.env.FORKING_KOVAN_URL,
-        enabled: !!process.env.FORKING_ENABLED
+        url: process.env.FORKING_URL,
+        enabled: true
       }
     },
 

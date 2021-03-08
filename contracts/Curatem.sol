@@ -1,6 +1,3 @@
-// pragma solidity ^0.5.5;
-
-
 import "./CuratemCommunity.sol";
 
 
@@ -34,8 +31,8 @@ contract Curatem {
         address _uniswapFactory,
         address _factory
     ) public returns (address) {
-        CuratemCommunity community = new CuratemCommunity(
-        );
+        CuratemCommunity community = new CuratemCommunity();
+        
         community.initialize(
             realitio,
             realityIoGnosisProxy,
@@ -48,7 +45,6 @@ contract Curatem {
         );
         
         emit NewCommunity(address(community));
-        
         return address(community);
     }
 }
