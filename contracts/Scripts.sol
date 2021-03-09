@@ -1,18 +1,17 @@
 pragma solidity >=0.6.6;
 
-// import "./SpamPredictionMarket.sol";
 import "./interfaces/ISpamPredictionMarket.sol";
 
-import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
-import '@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol';
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol";
 
 import "hardhat/console.sol";
 
 contract Scripts {
-    uint constant MAX_UINT = 2**256 - 1;
-    uint constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
+    uint256 constant MAX_UINT = 2**256 - 1;
+    uint256 constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
 
     // Approve collateral tokens for this script.
     // Then run the tx.
@@ -127,30 +126,27 @@ contract Scripts {
     }
 
     struct buyOutcomeElseProvideLiquidity_vars {
-        uint collateralTokenInAmount;
-        uint buyAmount;
+        uint256 collateralTokenInAmount;
+        uint256 buyAmount;
         IOutcomeToken x_token;
         IOutcomeToken notX_token;
         IERC20 collateralToken;
-        uint ammTokenInAmount;
-        uint xAmount;
-        uint notXAmount;
+        uint256 ammTokenInAmount;
+        uint256 xAmount;
+        uint256 notXAmount;
     }
 
     function buyOutcomeElseProvideLiquidity(
         address _market, 
         uint8 outcome,
-        uint buyAmount,
-        uint outcomeOddsNumerator,
-        uint outcomeOddsDenominator,
-
+        uint256 buyAmount,
+        uint256 outcomeOddsNumerator,
+        uint256 outcomeOddsDenominator,
         // Uniswap params.
         address _uniswapRouterV2,
-        uint amountAMin,
-        uint amountBMin
-    ) 
-        external
-    {
+        uint256 amountAMin,
+        uint256 amountBMin
+    ) external {
         require(buyAmount > UNISWAP_MINIMUM_LIQUIDITY, "ERR_UNISWAP_MINIMUM_LIQUIDITY");
 
         // Parameters.

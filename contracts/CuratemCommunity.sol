@@ -35,9 +35,9 @@ contract CuratemCommunity {
     Factory factory;
 
     uint32 timeoutResolution = 5 minutes;
-    uint constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
+    uint256 constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
-    uint constant MAX_UINT = 2**256 - 1;
+    uint256 constant MAX_UINT = 2**256 - 1;
 
     constructor(
     ) 
