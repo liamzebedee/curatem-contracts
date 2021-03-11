@@ -4,9 +4,11 @@
   "scripts": {
     "test:create-market": "yarn hardhat run scripts/create-market-fpmm.ts",
     "test:setup-metamask": "yarn hardhat run scripts/metamask.ts",
-    "deploy": "yarn hardhat run scripts/deploy.ts",
+    "deploy": "yarn hardhat run migrations/1_deploy.ts",
     "node:forked": "HARDHAT_NETWORK=hardhat yarn hardhat node",
-    "node": "yarn hardhat node"
+    "node": "yarn hardhat node",
+    "lint": "yarn prettier ./**/*.ts --check",
+    "lint:fix": "yarn prettier ./**/*.ts --check"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
@@ -19,10 +21,13 @@
     "chai": "^4.3.0",
     "ethereum-waffle": "^3.2.2",
     "ethers": "5.0.25",
-    "hardhat": "2.0.10",
+    "ethlint": "^1.2.5",
+    "hardhat": "^2.1.1",
     "hardhat-contract-sizer": "^2.0.2",
     "ipfs-http-client": "^49.0.1",
+    "prettier": "^2.2.1",
     "prettier-plugin-solidity": "^1.0.0-beta.5",
+    "solhint": "^3.3.3",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },

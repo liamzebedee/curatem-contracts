@@ -192,14 +192,14 @@ async function main() {
     CONDITIONAL_TOKENS_ADDRESS)
 
 
-  const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
-  // TODO
-  const metadata = {
-      tos: "https://twitter.com/liamzebedee",
-      template_hashes: []
-  }
-  const moderatorArbitrator = await ModeratorArbitrator.deploy(REALITYIO_ADDRESS, JSON.stringify(metadata));
-  const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
+  // const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
+  // // TODO
+  // const metadata = {
+  //     tos: "https://twitter.com/liamzebedee",
+  //     template_hashes: []
+  // }
+  // const moderatorArbitrator = await ModeratorArbitrator.deploy(REALITYIO_ADDRESS, JSON.stringify(metadata));
+  // const MODERATOR_MULTISIG_ADDRESS = moderatorArbitrator.address
 
 
   let network = await provider.getNetwork()

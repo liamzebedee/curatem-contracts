@@ -165,30 +165,36 @@ contract SpamPredictionMarket {
     //     marketState = uint8(MARKET_STATUS.FINALIZED);
     // }
 
-    // TODO: this is to be compatible with the Gnosis Realiio proxy.
-    // This should be moved into an external contract.
     function reportPayouts(
         bytes32 questionId,
-        uint8[] calldata payouts
+        uint256[] calldata payouts
     ) 
         external 
         isOpen 
     {
         // the oracle is responsible for implementing the market timeout.
-        require(msg.sender == address(oracle), "only oracle can report outcome");
-        require(payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
-        uint sum = 0;
-        uint firstPayoutIdx;
-        for(uint i = 0; i < payouts.length; i++) {
-            sum += payouts[i];
-            if(i == 1) {
-                firstPayoutIdx = i;
-            }
-        }
-        require(sum == 1, "payouts must resolve to one and only one final outcome");
-        finalOutcome = uint8(firstPayoutIdx);
-        marketState = uint8(MARKET_STATUS.FINALIZED);
-        emit Finalized(finalOutcome);
+        // require(msg.sender == address(oracle), "only oracle can report outcome");
+        // require(payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
+        
+        // uint sum = 0;
+        // uint firstPayoutIdx;
+        // for(uint i = 0; i < payouts.length; i++) {
+        //     sum += payouts[i];
+        //     if(payouts[i] == 1) {
+        //         firstPayoutIdx = i;
+        //     }
+        // }
+
+        // if(sum == 0) {
+        //     // Invalid outcome.
+        //     finalOutcome = OUTCOME_INVALID;
+        // } else {
+        //     require(sum == 1, "payouts must resolve to one and only one final outcome");
+        //     finalOutcome = uint8(firstPayoutIdx);
+        // }
+
+        // marketState = uint8(MARKET_STATUS.FINALIZED);
+        // emit Finalized(finalOutcome);
     }
 
     function redeem(uint amount) 

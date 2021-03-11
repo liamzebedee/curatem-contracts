@@ -47,4 +47,12 @@ contract Factory is Initializable, CloneFactory {
         );
         return clone;
     }
+
+    // function newModeratorArbitrator(
+    // )
+    //     external
+    //     returns (address)
+    // {
+
+    // }
 }

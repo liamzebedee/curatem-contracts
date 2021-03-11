@@ -17,6 +17,9 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
+const GAS_PRICE = 20e9; // 20 GWEI
+
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -46,6 +49,7 @@ export default {
 
   networks: {
     hardhat: {
+
       chainId: 42,
       forking: {
         url: process.env.FORKING_URL,
@@ -54,6 +58,9 @@ export default {
     },
 
     development: {
+      // gas: 12e6,
+			// blockGasLimit: 12e6,
+      // gasPrice: GAS_PRICE,
       url: "http://localhost:8545",
     },
     

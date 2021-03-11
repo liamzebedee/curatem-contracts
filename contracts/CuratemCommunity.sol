@@ -2,9 +2,12 @@ pragma solidity >=0.6.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IRealitio.sol";
+import "./interfaces/IArbitrator.sol";
 import "./interfaces/IConditionalTokens.sol";
 import "./SpamPredictionMarket.sol";
-import "./ModeratorArbitrator.sol";
+import "./moderator/ModeratorArbitrator.sol";
+import "hardhat/console.sol";
+import "./proxy/Proxyable.sol";
 
 
 interface IFPMMDeterministicFactory {
@@ -21,15 +24,15 @@ interface IFPMMDeterministicFactory {
 
 contract CuratemCommunity {
     IERC20 public token;
-    ModeratorArbitrator public moderatorArbitrator;
+    address payable public moderatorArbitrator;
     mapping(bytes32 => string) public itemUrlForDigest;
 
     event MarketCreated(bytes32 hashDigest, bytes32 conditionId, bytes32 questionId, address fixedProductMarketMaker);
     event NewSpamPredictionMarket(bytes32 hashDigest, bytes32 questionId, address market);
 
     IRealitio realitio;
-    IConditionalTokens conditionalTokens;
-    IFPMMDeterministicFactory fpmmFactory;
+    // IConditionalTokens conditionalTokens;
+    // IFPMMDeterministicFactory fpmmFactory;
     address realityIoGnosisProxy;
     address uniswapFactory;
     Factory factory;
@@ -48,25 +51,36 @@ contract CuratemCommunity {
     function initialize(
         address _realitio,
         address _realityIoGnosisProxy,
-        address _conditionalTokens,
-        address _fpmmFactory,
         address _uniswapFactory,
         address _factory,
         address _token,
-        address _moderatorArbitrator
+        address payable _moderatorArbitrator
     )
         public
     {
         realitio = IRealitio(_realitio);
         realityIoGnosisProxy = _realityIoGnosisProxy;
-        conditionalTokens = IConditionalTokens(_conditionalTokens);
-        fpmmFactory = IFPMMDeterministicFactory(_fpmmFactory);
         factory = Factory(_factory);
         uniswapFactory = _uniswapFactory;
 
         token = IERC20(_token);
-        moderatorArbitrator = ModeratorArbitrator(_moderatorArbitrator);
-        require(address(moderatorArbitrator.realitio()) == _realitio, "ERR_MODERATOR_ARBITRATOR_REALITIO");
+        moderatorArbitrator = _moderatorArbitrator;
+        require(
+            ModeratorArbitrator(moderatorArbitrator).arbitrator().realitio() == realitio,
+            "ERR_MODERATOR_ARBITRATOR_REALITIO"
+        );
+    }
+
+    function setTimeout(uint32 _timeoutResolution) public {
+        timeoutResolution = _timeoutResolution;
+    }
+
+    function setModeratorArbitrator(
+        address _moderatorArbitrator
+    )
+        public 
+    {
+        ModeratorArbitrator(moderatorArbitrator).setTarget(Proxyable(_moderatorArbitrator));
     }
 
     function createMarket(
@@ -87,10 +101,6 @@ contract CuratemCommunity {
         address oracle;
     }
 
-    function setTimeout(uint32 _timeoutResolution) public {
-        timeoutResolution = _timeoutResolution;
-    }
-
     function createPredictionMarket(
         string memory url
     ) 
@@ -105,7 +115,7 @@ contract CuratemCommunity {
             // "Is this spam? https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
             question: string(abi.encodePacked(
                 "Is this spam? - ", url, REALITIO_UNICODE_SEPERATOR, "\"Not Spam\",\"Spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
-            arbitrator: address(moderatorArbitrator),
+            arbitrator: moderatorArbitrator,
             timeout: timeoutResolution,
             opening_ts: uint32(block.timestamp),
             nonce: uint256(hashDigest),
@@ -120,6 +130,7 @@ contract CuratemCommunity {
             questionId_vars.timeout, 
             questionId_vars.opening_ts, 
             questionId_vars.nonce);
+        
         
         address market = factory.newSpamPredictionMarket(
             questionId_vars.oracle,
