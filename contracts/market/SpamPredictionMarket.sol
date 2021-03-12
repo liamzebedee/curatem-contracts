@@ -3,17 +3,19 @@ pragma solidity >=0.6.4;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
-import "./vendor/Owned.sol";
-import "./interfaces/IBPool.sol";
-import "./interfaces/IOutcomeToken.sol";
-import "./tokens/OutcomeToken.sol";
-import "./factories/Factory.sol";
+import "../vendor/Owned.sol";
+import "../interfaces/IBPool.sol";
+import "../interfaces/IOutcomeToken.sol";
+import "../interfaces/ISpamPredictionMarket.sol";
+import "../tokens/OutcomeToken.sol";
+import "../factories/Factory.sol";
+import "./RealitioOracleResolverMixin.sol";
 
 interface IFlashLoanReceiver {
     function onFlashLoan(uint256 amount) external;
 }
 
-contract SpamPredictionMarket {
+contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMixin {
     uint constant MAX_UINT = 2**256 - 1;
     uint constant BALANCER_MIN_BALANCE = 10**6; // 10**18 / 10**12
     uint constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
@@ -34,12 +36,15 @@ contract SpamPredictionMarket {
     IUniswapV2Factory public uniswapFactory;
     Factory factory;
     IBPool public pool;
-    IERC20 public collateralToken;
-    address public oracle;
+    IERC20 public override collateralToken;
+    address public override oracle;
     IOutcomeToken[2] public outcomeTokens;
 
     uint8 marketState = uint8(MARKET_STATUS.INITIALIZING);
-    uint8 finalOutcome = 0;
+    
+    uint constant OUTCOME_INVALID = 0;
+    uint8 finalOutcome;
+    uint8[2] payouts;
 
     modifier isInitializing() {
         require(marketState == uint(MARKET_STATUS.INITIALIZING), "Market is not in INITIALIZING state.");
@@ -65,11 +70,14 @@ contract SpamPredictionMarket {
         address _oracle,
         address _collateralToken,
         address _uniswapFactory,
-        address _factory
+        address _factory,
+        bytes32 _questionId
     ) 
         public 
         isInitializing 
     {
+        RealitioOracleResolverMixin.initialize(_questionId);
+
         oracle = _oracle;
         collateralToken = IERC20(_collateralToken);
         uniswapFactory = IUniswapV2Factory(_uniswapFactory);
@@ -98,6 +106,7 @@ contract SpamPredictionMarket {
 
     function buy(uint amount) 
         public 
+        override
         isOpen 
     {
         require(
@@ -166,48 +175,61 @@ contract SpamPredictionMarket {
     // }
 
     function reportPayouts(
-        bytes32 questionId,
-        uint256[] calldata payouts
+        uint256[] calldata _payouts
     ) 
         external 
+        override
         isOpen 
     {
         // the oracle is responsible for implementing the market timeout.
-        // require(msg.sender == address(oracle), "only oracle can report outcome");
-        // require(payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
+        require(msg.sender == address(oracle), "ERR_ONLY_ORACLE");
+        require(payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
+        payouts = _payouts;
         
-        // uint sum = 0;
-        // uint firstPayoutIdx;
-        // for(uint i = 0; i < payouts.length; i++) {
-        //     sum += payouts[i];
-        //     if(payouts[i] == 1) {
-        //         firstPayoutIdx = i;
-        //     }
-        // }
+        uint sum = 0;
+        uint firstPayoutIdx;
+        for(uint i = 0; i < payouts.length; i++) {
+            sum += payouts[i];
+            if(payouts[i] == 1) {
+                firstPayoutIdx = i;
+            }
+        }
 
-        // if(sum == 0) {
-        //     // Invalid outcome.
-        //     finalOutcome = OUTCOME_INVALID;
-        // } else {
-        //     require(sum == 1, "payouts must resolve to one and only one final outcome");
-        //     finalOutcome = uint8(firstPayoutIdx);
-        // }
+        if(sum == outcomeTokens.length) {
+            // Invalid outcome.
+            // finalOutcome = OUTCOME_INVALID;
+        } else {
+            require(sum == 1, "payouts must resolve to one and only one final outcome");
+            finalOutcome = uint8(firstPayoutIdx);
+        }
 
-        // marketState = uint8(MARKET_STATUS.FINALIZED);
-        // emit Finalized(finalOutcome);
+        marketState = uint8(MARKET_STATUS.FINALIZED);
+        emit Finalized(finalOutcome);
     }
 
-    function redeem(uint amount) 
-        public 
-        isFinalized 
+    function redeem(uint amount)
+        public
+        isFinalized
     {
-        IERC20 outcomeToken = outcomeTokens[finalOutcome];
+        for(uint i = 0; i < payouts.length; i++) {
+            if(payouts[i] == 1) {
+                redeemOutcome(i, amount);
+            }
+        }
+    }
+
+    function redeemOutcome(uint outcome, uint amount) 
+        public
+        isFinalized
+    {
+        require(payouts[outcome] == 1, "ERR_NO_PAYOUT");
+        IERC20 outcomeToken = outcomeTokens[outcome];
         require(
-            outcomeTokens[finalOutcome].balanceOf(msg.sender) >= amount,
+            outcomeToken.balanceOf(msg.sender) >= amount,
             "cannot redeem outcome tokens, amount >= balance"
         );
         require(
-            outcomeTokens[finalOutcome].allowance(msg.sender, address(this)) >= amount, 
+            outcomeToken.allowance(msg.sender, address(this)) >= amount, 
             "cannot redeem outcome tokens, amount >= allowance"
         );
         outcomeToken.transferFrom(msg.sender, address(this), amount);
@@ -216,7 +238,8 @@ contract SpamPredictionMarket {
     }
 
     function getOutcome()
-        public view
+        public 
+        view
         isFinalized
         returns (uint8)
     {
@@ -241,6 +264,7 @@ contract SpamPredictionMarket {
 
     function getOutcomeTokens()
         external
+        override
         view
         returns (IOutcomeToken[2] memory)
     {

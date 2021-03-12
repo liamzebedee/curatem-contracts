@@ -1,13 +1,14 @@
 import "../vendor/CloneFactory.sol";
 import "../vendor/Initializable.sol";
 import "../tokens/OutcomeToken.sol";
-import "../SpamPredictionMarket.sol";
+import "../market/SpamPredictionMarket.sol";
 
 contract Factory is Initializable, CloneFactory {
     address public outcomeToken;
     address public spamPredictionMarket;
 
     constructor() public {}
+    
     function initialize()
         public 
         uninitialized
@@ -33,7 +34,8 @@ contract Factory is Initializable, CloneFactory {
         address _oracle,
         address _collateralToken,
         address _uniswapFactory,
-        address _factory
+        address _factory,
+        bytes32 _questionId
     )
         external
         returns (address)
@@ -43,7 +45,8 @@ contract Factory is Initializable, CloneFactory {
             _oracle,
             _collateralToken,
             _uniswapFactory,
-            _factory
+            _factory,
+            _questionId
         );
         return clone;
     }

@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IRealitio.sol";
 import "./interfaces/IArbitrator.sol";
 import "./interfaces/IConditionalTokens.sol";
-import "./SpamPredictionMarket.sol";
+import "./market/SpamPredictionMarket.sol";
 import "./moderator/ModeratorArbitrator.sol";
 import "hardhat/console.sol";
 import "./proxy/Proxyable.sol";
@@ -36,8 +36,8 @@ contract CuratemCommunity {
     address realityIoGnosisProxy;
     address uniswapFactory;
     Factory factory;
-
     uint32 timeoutResolution = 5 minutes;
+
     uint256 constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
     uint256 constant MAX_UINT = 2**256 - 1;
@@ -136,7 +136,8 @@ contract CuratemCommunity {
             questionId_vars.oracle,
             address(token),
             uniswapFactory,
-            address(factory)
+            address(factory),
+            questionId
         );
 
         emit NewSpamPredictionMarket(hashDigest, questionId, market);

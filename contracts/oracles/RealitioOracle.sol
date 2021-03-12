@@ -1,6 +1,6 @@
 
 import "../interfaces/IRealitio.sol";
-import "../SpamPredictionMarket.sol";
+import "../market/SpamPredictionMarket.sol";
 
 contract RealitioOracle {
   IRealitio public realitio;
@@ -13,14 +13,14 @@ contract RealitioOracle {
     realitio = _realitio;
   }
 
-  function resolveMarket(
-    address predictionMarket,
-    bytes32 questionId
-  ) external {
-    uint256[] memory payouts;
-    payouts = getSingleSelectPayouts(questionId, CURATEM_NUM_OUTCOMES);
-    SpamPredictionMarket(predictionMarket).reportPayouts(questionId, payouts);
-  }
+  // function resolveMarket(
+  //   address predictionMarket,
+  //   bytes32 questionId
+  // ) external {
+  //   uint256[] memory payouts;
+  //   payouts = getSingleSelectPayouts(questionId, CURATEM_NUM_OUTCOMES);
+  //   SpamPredictionMarket(predictionMarket).reportPayouts(questionId, payouts);
+  // }
 
   // function isRealitioUnavailable(bytes32 questionId) internal returns (bool unavailable) {
   //   // bytes32 content_hash = realitio.getContentHash(questionId);

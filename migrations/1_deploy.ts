@@ -13,6 +13,11 @@ function fieldsToInline(obj) {
 }
 
 async function main() {
+    const {
+        METAMASK_DEV_ACCOUNT
+    } = process.env
+    if(!METAMASK_DEV_ACCOUNT) throw new Error("METAMASK_DEV_ACCOUNT not defined")
+    
     let network = await hre.ethers.provider.getNetwork()
     let networkId = network.chainId
     console.log(`Deploying for network ID ${networkId}`)
@@ -53,19 +58,19 @@ async function main() {
     // Test
     // 
 
-    const TestProxy = await hre.ethers.getContractFactory('TestProxy')
-    const testProxy = await TestProxy.deploy()
+    // const TestProxy = await hre.ethers.getContractFactory('TestProxy')
+    // const testProxy = await TestProxy.deploy()
 
-    const TestImpl = await hre.ethers.getContractFactory('TestImpl')
-    const testImpl = await TestImpl.deploy(testProxy.address)
+    // const TestImpl = await hre.ethers.getContractFactory('TestImpl')
+    // const testImpl = await TestImpl.deploy(testProxy.address)
     
-    await testProxy.setTarget(testImpl.address)
-    const testInstance = await hre.ethers.getContractAt("TestImpl", testProxy.address)
-    await testInstance.test()
+    // await testProxy.setTarget(testImpl.address)
+    // const testInstance = await hre.ethers.getContractAt("TestImpl", testProxy.address)
+    // await testInstance.test()
     
-    const TestWrapper2 = await hre.ethers.getContractFactory("TestWrapper2")
-    const testWrapper2 = await TestWrapper2.deploy()
-    await testWrapper2.test(testProxy.address)
+    // const TestWrapper2 = await hre.ethers.getContractFactory("TestWrapper2")
+    // const testWrapper2 = await TestWrapper2.deploy()
+    // await testWrapper2.test(testProxy.address)
 
 
     //
@@ -83,7 +88,8 @@ async function main() {
         template_hashes: [],
     }
     const moderatorArbitratorV1 = await ModeratorArbitratorV1.deploy(moderatorArbitrator.address)
-    await moderatorArbitratorV1.initialize(Realitio, JSON.stringify(metadata), account)
+    const moderatorMultisig = METAMASK_DEV_ACCOUNT
+    await moderatorArbitratorV1.initialize(Realitio, JSON.stringify(metadata), moderatorMultisig)
 
     await moderatorArbitrator.setTarget(moderatorArbitratorV1.address)
 

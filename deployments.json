@@ -1,34 +1,34 @@
 {
     "42": {
         "ModeratorArbitrator": {
-            "address": "0x64Ed22277402f01f3AD382270B419b9F5e87F4c4",
-            "hash": "0x7ac05864b2e1cfdf89019afe2e9cbd2be5c8db330e059ec5255e32fc2078437a",
-            "blockHash": "0x5d14157075dc3142635e04496ab019fef05d420250f3922f23a8a82939b33383",
-            "blockNumber": 23862153
+            "address": "0x3dCe73fF914a4F844159A4B2dD9170d9499a783e",
+            "hash": "0x005e5c7d068da4eb06f7db7b7212e52f36fce513f38b4c3199573cdff745ba54",
+            "blockHash": "0xfb323e80d01be6ddce4ba5cb22d21278dd2f69881aefb65cb743f365b47c09fd",
+            "blockNumber": 23862188
         },
         "Scripts": {
-            "address": "0xb334795bf50e4943d076Dfb38D8C1A50F9F5a101",
-            "hash": "0xde64d6207a2fc377c79cf954dc238c144650a2dacd5d0a8d6b376d05209b05d7",
-            "blockHash": "0x71511064c549ad7c59d5e803789f0f25c3411112092daa94e2a7e52cfd724a14",
-            "blockNumber": 23862157
+            "address": "0xa98b9f2D8426DF201F4732947635C52841b04a25",
+            "hash": "0x9fbc1d3af255db1f0b6157ea91997a27f8946393a2c068d413d5b5c21a1bf299",
+            "blockHash": "0x4194f7adcfb725387418cfab983bace2401583ed4b949c81d7a84a37d7209632",
+            "blockNumber": 23862192
         },
         "Factory": {
-            "address": "0x6DC1bEbb8e0881aCa6F082F5F53dD740c2DDF379",
-            "hash": "0x35f843c82670d60a9b8692b65c7efa2132c4bcc098d834465ac35e82b29dba76",
-            "blockHash": "0xea0db4419f2ae3a2425e05b0a6b8a69723dcf2d8c20e094c5ea1db2ef516585d",
-            "blockNumber": 23862158
+            "address": "0x394b07B5c9A19a553E49eC95A2aF1c4a56eA634B",
+            "hash": "0x2a04fbbbd7be793cd6d807633f3e420969baa6be5e34cd13190b152109573b32",
+            "blockHash": "0x2b4ccd29a918460438d90be0d5315e95f2aff20c5c47bbd1a47501081f95952c",
+            "blockNumber": 23862193
         },
         "Curatem": {
-            "address": "0x1e86fCe4d102A5924A9EF503f772fCA162Af2067",
-            "hash": "0xe6a19389e23b42acef3cc2afb33d0d6d5cad3f7d8ab5041a454ff300ae74dc70",
-            "blockHash": "0x9b820c4fee689acf4d7c0eb7a6133bd5c4c0fdb18b3c55dfc4a356186f68ea31",
-            "blockNumber": 23862160
+            "address": "0xe6cFc17053c64838Fd7bb55BD4A2cb5b207A71ed",
+            "hash": "0x085f0cd013205e216f6111985038f18ded8522e1b5ed01e53ea4d87e024e7b5d",
+            "blockHash": "0xb99d781899c1aedced6b9c143216ec06c02c240778d07434d7863bb6eb417c0b",
+            "blockNumber": 23862195
         },
         "RedditCommunity1": {
-            "address": "0x17418E4c6D7b0fBDe954bdf9f8Febd87DE2EE8a3",
-            "hash": "0xdd51d9ff834282606ddd523ee56ebbd8cd5bf1c420268d8b394b3e39f94b7544",
-            "blockHash": "0xf1b491f5386fc21cd546a468d2c375bb149ae75d2dfc93845bb0b7db7907cb7e",
-            "blockNumber": 23862161
+            "address": "0x4c5f7C80873258084a9daCc27EC49CEBb433e16d",
+            "hash": "0x4189f520123a33549e5b6e78ba69c539597ad397aa8d05c549fa2ac795d8eaee",
+            "blockHash": "0x3a56efbe38d683c88e057625fcefc68dac45b6fd5761c4f7d27cd2c9612e759b",
+            "blockNumber": 23862196
         },
         "UniswapV2Router02": {
             "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
