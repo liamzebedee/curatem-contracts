@@ -66,7 +66,7 @@ contract CuratemCommunity {
         token = IERC20(_token);
         moderatorArbitrator = _moderatorArbitrator;
         require(
-            ModeratorArbitrator(moderatorArbitrator).arbitrator().realitio() == realitio,
+            ModeratorArbitrator(moderatorArbitrator).impl().realitio() == realitio,
             "ERR_MODERATOR_ARBITRATOR_REALITIO"
         );
     }
@@ -112,7 +112,7 @@ contract CuratemCommunity {
         
         QuestionIdVars memory questionId_vars = QuestionIdVars({
             template_id: 2,
-            // "Is this spam? https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
+            // "Is this spam? - https://www.reddit.com/r/ethereum/comments/hbjx25/the_great_reddit_scaling_bakeoff/␟"Spam","Not spam"␟Spam Classification␟en_US"
             question: string(abi.encodePacked(
                 "Is this spam? - ", url, REALITIO_UNICODE_SEPERATOR, "\"Not Spam\",\"Spam\"", REALITIO_UNICODE_SEPERATOR, "Spam Classification", REALITIO_UNICODE_SEPERATOR, "en_US")),
             arbitrator: moderatorArbitrator,
@@ -130,7 +130,6 @@ contract CuratemCommunity {
             questionId_vars.timeout, 
             questionId_vars.opening_ts, 
             questionId_vars.nonce);
-        
         
         address market = factory.newSpamPredictionMarket(
             questionId_vars.oracle,

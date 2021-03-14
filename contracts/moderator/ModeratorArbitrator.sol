@@ -23,7 +23,14 @@ contract ModeratorArbitrator is Proxy {
     {
     }
 
-    function arbitrator() public view returns (IArbitrator) {
+    /**
+     * Returns the underlying implementation, suitable for use with
+     * view functions.
+     * 
+     * This is needed as Proxy changes state (`messageSender`), and thus
+     * any staticcall's will inevitably revert the tx.
+     */
+    function impl() public view returns (IArbitrator) {
         return IArbitrator(address(target));
     }
 }
