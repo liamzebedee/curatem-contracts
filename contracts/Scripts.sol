@@ -261,15 +261,4 @@ contract Scripts {
             return;
         }
     }
-
-    // function resolveMarket(
-    //     address realitioOracle,
-    //     address predictionMarket
-    // )
-    //     external
-    // {
-    //     realitioOracle.resolveMarket(msg.sender, questionId, CURATEM_NUM_OUTCOMES);
-    // }
-
-
 }

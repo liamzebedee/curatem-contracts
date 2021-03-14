@@ -14,8 +14,5 @@ interface ISpamPredictionMarket {
     
     function oracle() external view returns (address);
 
-    function reportPayouts(
-        uint256[] calldata payouts
-    ) 
-        external;
+    function reportPayouts(uint256[] calldata payouts) external;
 }

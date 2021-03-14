@@ -17,7 +17,6 @@ interface IFlashLoanReceiver {
 
 contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMixin {
     uint constant MAX_UINT = 2**256 - 1;
-    uint constant BALANCER_MIN_BALANCE = 10**6; // 10**18 / 10**12
     uint constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
 
     enum MARKET_STATUS {
@@ -30,7 +29,7 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     event PoolCreated(address pool);
     event SharesBought(address user, uint amount);
     event SharesSold(address user, uint amount);
-    event Finalized(uint finalOutcome);
+    event Finalized();
     event SharesRedeemed(address user, uint amount);
     
     IUniswapV2Factory public uniswapFactory;
@@ -41,10 +40,8 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     IOutcomeToken[2] public outcomeTokens;
 
     uint8 marketState = uint8(MARKET_STATUS.INITIALIZING);
-    
-    uint constant OUTCOME_INVALID = 0;
-    uint8 finalOutcome;
-    uint8[2] payouts;
+    uint256[2] payouts;
+    uint256 totalPayouts;
 
     modifier isInitializing() {
         require(marketState == uint(MARKET_STATUS.INITIALIZING), "Market is not in INITIALIZING state.");
@@ -104,7 +101,7 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     {
     }
 
-    function buy(uint amount) 
+    function buy(uint256 amount) 
         public 
         override
         isOpen 
@@ -124,7 +121,7 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
         emit SharesBought(msg.sender, amount);
     }
 
-    function sell(uint amount) 
+    function sell(uint256 amount) 
         public 
         isOpen 
     {
@@ -139,7 +136,7 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
             );
             outcomeTokens[i].burn(address(msg.sender), amount);
         }
-        collateralToken.transferFrom(address(this), msg.sender, amount);
+        collateralToken.transfer(msg.sender, amount);
         emit SharesSold(msg.sender, amount);
     }
 
@@ -161,19 +158,7 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
             outcomeTokens[i].burn(receiver, amount);
         }
     }
-
-    // function report(uint8 _finalOutcome) 
-    //     public 
-    //     isOpen 
-    // {
-    //     // ask oracle for outcome.
-    //     // the oracle is responsible for implementing the market timeout.
-    //     require(msg.sender == address(oracle), "only oracle can report outcome");
-    //     require(_finalOutcome < outcomeTokens.length, "outcome must be within range");
-    //     finalOutcome = _finalOutcome;
-    //     marketState = uint8(MARKET_STATUS.FINALIZED);
-    // }
-
+    
     function reportPayouts(
         uint256[] calldata _payouts
     ) 
@@ -183,47 +168,47 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     {
         // the oracle is responsible for implementing the market timeout.
         require(msg.sender == address(oracle), "ERR_ONLY_ORACLE");
-        require(payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
-        payouts = _payouts;
+        require(_payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
         
         uint sum = 0;
-        uint firstPayoutIdx;
-        for(uint i = 0; i < payouts.length; i++) {
-            sum += payouts[i];
-            if(payouts[i] == 1) {
-                firstPayoutIdx = i;
-            }
+        for(uint i = 0; i < _payouts.length; i++) {
+            // TODO: in future, we will support fractional payouts.
+            require(_payouts[i] <= 1, "ERR_FRACTIONAL_PAYOUT"); 
+            sum += _payouts[i];
+            payouts[i] = _payouts[i];
         }
-
-        if(sum == outcomeTokens.length) {
-            // Invalid outcome.
-            // finalOutcome = OUTCOME_INVALID;
-        } else {
-            require(sum == 1, "payouts must resolve to one and only one final outcome");
-            finalOutcome = uint8(firstPayoutIdx);
-        }
+        require(sum >= 1, "at least one payout must be made");
+        totalPayouts = sum;
 
         marketState = uint8(MARKET_STATUS.FINALIZED);
-        emit Finalized(finalOutcome);
+        emit Finalized();
     }
 
-    function redeem(uint amount)
+    /**
+     * Burns `amount` outcome token for every winning outcome, and
+     * sends the caller the equivalent collateralToken.
+     */
+    function redeem(uint256 amount)
         public
         isFinalized
     {
-        for(uint i = 0; i < payouts.length; i++) {
+        for(uint256 i = 0; i < payouts.length; i++) {
             if(payouts[i] == 1) {
                 redeemOutcome(i, amount);
             }
         }
     }
 
-    function redeemOutcome(uint outcome, uint amount) 
+    /**
+     * Burns one outcome token and sends the caller the equivalent collateral amount,
+     */
+    function redeemOutcome(uint256 outcome, uint256 amount) 
         public
         isFinalized
     {
         require(payouts[outcome] == 1, "ERR_NO_PAYOUT");
         IERC20 outcomeToken = outcomeTokens[outcome];
+        uint256 redeemable = amount * payouts[outcome] / totalPayouts;
         require(
             outcomeToken.balanceOf(msg.sender) >= amount,
             "cannot redeem outcome tokens, amount >= balance"
@@ -233,17 +218,17 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
             "cannot redeem outcome tokens, amount >= allowance"
         );
         outcomeToken.transferFrom(msg.sender, address(this), amount);
-        collateralToken.transferFrom(address(this), msg.sender, amount);
-        emit SharesRedeemed(msg.sender, amount);
+        collateralToken.transfer(msg.sender, redeemable);
+        emit SharesRedeemed(msg.sender, redeemable);
     }
 
-    function getOutcome()
+    function getPayouts()
         public 
         view
         isFinalized
-        returns (uint8)
+        returns (uint256[2] memory)
     {
-        return finalOutcome;
+        return payouts;
     }
 
     function notSpamToken()
