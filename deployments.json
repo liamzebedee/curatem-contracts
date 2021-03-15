@@ -11,6 +11,36 @@
         },
         "UniswapV2Factory": {
             "address": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        },
+        "ModeratorArbitrator": {
+            "address": "0xefE11bB526e0EDb2677F16cCaB2519DA8cAeb105",
+            "blockHash": "0x74675abc9ccf71875baa7c617ce10fab6d8981ab5f83e2a0abba7bb9883e8a42",
+            "blockNumber": 8237143
+        },
+        "Scripts": {
+            "address": "0x2406df1268f8D49D8284007F2DCCB35B83A20d4c",
+            "blockHash": "0x81e507c5dd265d05132b2148a1eb1cc714dfbe44bd9499d30676415549415fdf",
+            "blockNumber": 8237146
+        },
+        "Factory": {
+            "address": "0x115706783317e59ba62eDa9F22D7a01c42f8601F",
+            "blockHash": "0xa74ff1731fda173fea71b930312a3df5b2e3adfc250b023476bc3830f1fa89ec",
+            "blockNumber": 8237148
+        },
+        "CuratemV1": {
+            "address": "0x115706783317e59ba62eDa9F22D7a01c42f8601F",
+            "blockHash": "0xa74ff1731fda173fea71b930312a3df5b2e3adfc250b023476bc3830f1fa89ec",
+            "blockNumber": 8237148
+        },
+        "Curatem": {
+            "address": "0x5E307f917FE24e86057780D6Ab0EF298438A03a4",
+            "blockHash": "0xbfa2d062c93f1bef789c4bda4786df36eea682c0ff3cb83bff6206627ee04a3f",
+            "blockNumber": 8237150
+        },
+        "RedditCommunity1": {
+            "address": "0xB0bBbdACA84Abd54B1DB755947EA6C27b50e12C9",
+            "blockHash": "0xe62455a6523aecedd763e8c2fc3b38912b30fd64d9ae12fad5df490833e29799",
+            "blockNumber": 8237152
         }
     },
     "42": {

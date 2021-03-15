@@ -1,6 +1,12 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "_proxy",
+        "type": "address"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -41,55 +47,13 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "contract Proxyable",
-        "name": "newTarget",
+        "internalType": "address",
+        "name": "proxyAddress",
         "type": "address"
       }
     ],
-    "name": "TargetUpdated",
+    "name": "ProxyUpdated",
     "type": "event"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "fallback"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes",
-        "name": "callData",
-        "type": "bytes"
-      },
-      {
-        "internalType": "uint256",
-        "name": "numTopics",
-        "type": "uint256"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "topic1",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "topic2",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "topic3",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "bytes32",
-        "name": "topic4",
-        "type": "bytes32"
-      }
-    ],
-    "name": "_emit",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -100,10 +64,23 @@
   },
   {
     "inputs": [],
-    "name": "impl",
+    "name": "integrationProxy",
     "outputs": [
       {
-        "internalType": "contract IArbitrator",
+        "internalType": "contract Proxy",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "messageSender",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -151,24 +128,11 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "contract Proxyable",
-        "name": "_target",
-        "type": "address"
-      }
-    ],
-    "name": "setTarget",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "target",
+    "name": "proxy",
     "outputs": [
       {
-        "internalType": "contract Proxyable",
+        "internalType": "contract Proxy",
         "name": "",
         "type": "address"
       }
@@ -177,7 +141,42 @@
     "type": "function"
   },
   {
-    "stateMutability": "payable",
-    "type": "receive"
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "_integrationProxy",
+        "type": "address"
+      }
+    ],
+    "name": "setIntegrationProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
+    ],
+    "name": "setMessageSender",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "_proxy",
+        "type": "address"
+      }
+    ],
+    "name": "setProxy",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]
