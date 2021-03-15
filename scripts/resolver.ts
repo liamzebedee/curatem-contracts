@@ -62,55 +62,53 @@ abstract class ContractResolver {
   import { join } from 'path'
   import { ethers } from 'ethers'
   
+  function resolveWithResolver(contracts: string[], resolver: ContractResolver) {
+    return contracts
+      .reduce((addresses: ContractAddresses, contract: string) => {
+        addresses[contract] = resolver.resolve(contract)
+        return addresses
+      }, {})
+  }
+
   export async function resolveContracts(provider: ethers.providers.Provider): Promise<ContractAddresses> {
     let networkId: number
     let network = await provider.getNetwork()
     networkId = network.chainId
     // console.log(networkId)
   
-    let resolver: ContractResolver
-    let resolver2: ContractResolver
-    let resolver3: ContractResolver
     
-    if(networkId == 31337 || networkId == 42) {
-      // This is a development network.
-      // Load the addresses from the build artifacts.
-      resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts'))
-      resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts'))
-      resolver3 = new DeploymentsJsonResolver(networkId, '../deployments.json')
-    } else {
-      console.warn(`Network ${networkId} not configured with contracts for resolution`)
-      return {}
-    }
 
+    let resolvedContracts
+    
     const omenContracts = [
       'Realitio',
-      'RealitioProxy',
-      'ConditionalTokens',
-      'FPMMDeterministicFactory',
       'WETH9'
-    ]
-    const balancerContracts = [
-      'BFactory'
     ]
     const deployments = [
       'UniswapV2Factory',
       'UniswapV2Router02'
     ]
 
-    function resolveWithResolver(contracts: string[], resolver: ContractResolver) {
-      return contracts
-        .reduce((addresses: ContractAddresses, contract: string) => {
-          addresses[contract] = resolver.resolve(contract)
-          return addresses
-        }, {})
+    if(networkId == 31337 || networkId == 42) {
+      // This is a development network.
+      // Load the addresses from the build artifacts.
+      const resolver = new GanacheArtifactResolver(networkId, join(__dirname, '../../omen-subgraph/build/contracts'))
+      const resolver2 = new GanacheArtifactResolver(networkId, join(__dirname, '../../balancer-core/build/contracts'))
+      const resolver3 = new DeploymentsJsonResolver(networkId, '../deployments.json')
+      
+      resolvedContracts = {
+        ...resolveWithResolver(omenContracts, resolver),
+        // ...resolveWithResolver(balancerContracts, resolver2),
+        ...resolveWithResolver(deployments, resolver3)
+      }
+    } else {
+      const resolver = new DeploymentsJsonResolver(networkId, '../deployments.json')
+      resolvedContracts = {
+        ...resolveWithResolver(omenContracts, resolver),
+        ...resolveWithResolver(deployments, resolver)
+      }
     }
-
-    const resolvedContracts = {
-      ...resolveWithResolver(omenContracts, resolver),
-      ...resolveWithResolver(balancerContracts, resolver2),
-      ...resolveWithResolver(deployments, resolver3)
-    }
+    
     const contractsToSanityCheck = Object.keys(resolvedContracts)
     await Promise.allSettled(
       contractsToSanityCheck.map(async contractName => {

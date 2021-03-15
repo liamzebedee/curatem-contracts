@@ -41,9 +41,6 @@ async function main() {
     const vendoredContracts = await resolveContracts(provider)
     const {
         Realitio,
-        RealitioProxy,
-        ConditionalTokens,
-        FPMMDeterministicFactory,
         WETH9,
         UniswapV2Factory,
     } = vendoredContracts
@@ -77,6 +74,7 @@ async function main() {
     // Deploy: ModeratorArbitrator.
     //
 
+    console.log(`Deploy: ModeratorArbitrator`)
     const ModeratorArbitrator = await hre.ethers.getContractFactory('ModeratorArbitrator')
     const moderatorArbitrator = await ModeratorArbitrator.deploy()
     contracts['ModeratorArbitrator'] = moderatorArbitrator
@@ -96,7 +94,8 @@ async function main() {
     //
     // Deploy: Scripts, Factory.
     //
-
+    
+    console.log(`Deploy: Scripts, Factory.`)
     const Scripts = await hre.ethers.getContractFactory('Scripts')
     const scripts = await Scripts.deploy()
     contracts['Scripts'] = scripts
@@ -111,6 +110,7 @@ async function main() {
     //
     // Deploy: Curatem.
     //
+    console.log(`Deploy: Curatem.`)
     const Curatem = await hre.ethers.getContractFactory('Curatem')
     const curatem = await Curatem.deploy()
     const CuratemV1 = await hre.ethers.getContractFactory('CuratemV1', {

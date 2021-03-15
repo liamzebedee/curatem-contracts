@@ -1,4 +1,18 @@
 {
+    "4": {
+        "Realitio": {
+            "address": "0x50e35a1ed424ab9c0b8c7095b3d9ec2fb791a168"
+        },
+        "WETH9": {
+            "address": "0xc778417e063141139fce010982780140aa0cd5ab"
+        },
+        "UniswapV2Router02": {
+            "address": "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+        },
+        "UniswapV2Factory": {
+            "address": "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+        }
+    },
     "42": {
         "ModeratorArbitrator": {
             "address": "0x029018E31007D326D93c5535AA0F8A1F68214160",
