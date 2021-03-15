@@ -12,6 +12,18 @@ function fieldsToInline(obj) {
     return Object.entries(obj).map(([ k, v ]) => `${k}=${v}`).join(' ')
 }
 
+let contracts: {
+    [key: string]: Contract
+} = {}
+
+async function saveDeployment(name: string, contract: ethers.Contract) {
+    const receipt = await contract.deployTransaction.wait(1)
+    contracts[name] = {
+        deployTransaction: receipt,
+        address: receipt.contractAddress,
+    } as unknown as Contract
+}
+
 async function main() {
     const {
         METAMASK_DEV_ACCOUNT
@@ -25,11 +37,8 @@ async function main() {
     let provider = hre.ethers.provider
     const signer = provider.getSigner()
     const account = await signer.getAddress()
-
     let deployments = require(DEPLOYMENTS_PATH)
-    let contracts: {
-        [key: string]: Contract
-    } = {}
+    
     const libraries: {
         [key: string]: string
     } = {}
@@ -77,7 +86,8 @@ async function main() {
     console.log(`Deploy: ModeratorArbitrator`)
     const ModeratorArbitrator = await hre.ethers.getContractFactory('ModeratorArbitrator')
     const moderatorArbitrator = await ModeratorArbitrator.deploy()
-    contracts['ModeratorArbitrator'] = moderatorArbitrator
+    await saveDeployment('ModeratorArbitrator', moderatorArbitrator)
+    console.log(moderatorArbitrator.deployTransaction)
 
     const ModeratorArbitratorV1 = await hre.ethers.getContractFactory('ModeratorArbitratorV1')
     // TODO
@@ -98,14 +108,14 @@ async function main() {
     console.log(`Deploy: Scripts, Factory.`)
     const Scripts = await hre.ethers.getContractFactory('Scripts')
     const scripts = await Scripts.deploy()
-    contracts['Scripts'] = scripts
+    await saveDeployment('Scripts', scripts)
 
     const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
     const curatemCommunity = await CuratemCommunity.deploy()
     const Factory = await hre.ethers.getContractFactory('Factory', { libraries })
     const factory = await Factory.deploy()
     await factory.initialize(curatemCommunity.address)
-    contracts['Factory'] = factory
+    await saveDeployment('Factory', factory)
 
     //
     // Deploy: Curatem.
@@ -113,6 +123,7 @@ async function main() {
     console.log(`Deploy: Curatem.`)
     const Curatem = await hre.ethers.getContractFactory('Curatem')
     const curatem = await Curatem.deploy()
+    await saveDeployment('Curatem', curatem)
     const CuratemV1 = await hre.ethers.getContractFactory('CuratemV1', {
         libraries,
     })
@@ -122,9 +133,8 @@ async function main() {
         UniswapV2Factory,
         factory.address
     )
+    await saveDeployment('CuratemV1', factory)
     await curatem.setTarget(curatemV1.address)
-    contracts['CuratemV1'] = curatemV1
-    contracts['Curatem'] = curatem
 
     //
     // Deploy an example community.
@@ -142,17 +152,18 @@ async function main() {
         const { token, moderator } = community
         console.log(`Deploying community "${community.id}", ${fieldsToInline({ token, moderator })}`)
 
-        const salt = ethers.BigNumber.from(ethers.utils.randomBytes(32))
-
         const res = await curatemV1.createCommunity(
             community.token,
-            community.moderator
+            community.moderator,
+            { 
+                gasLimit: 194687
+            }
         )
         const receipt = await res.wait()
         const event = receipt.events.find((log) => log.event === 'NewCommunity')
 
         contracts[community.id] = {
-            deployTransaction: res,
+            deployTransaction: receipt,
             address: event.args.community,
         } as Contract // TODO: hack
     }
