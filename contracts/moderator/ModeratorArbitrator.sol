@@ -1,7 +1,6 @@
 pragma solidity >=0.6.0;
 import "../interfaces/IArbitrator.sol";
 import "../proxy/Proxy.sol";
-import "../proxy/Proxyable.sol";
 
 /**
  * The ModeratorArbitrator is an upgradeable [1] arbitrator for Realitio.

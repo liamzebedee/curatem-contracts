@@ -36,7 +36,7 @@ contract CloneFactory {
     }
   }
 
-  function isClone(address target, address query) internal view returns (bool result) {
+  function isClone(address target, address query) external view returns (bool result) {
     bytes20 targetBytes = bytes20(target);
     assembly {
       let clone := mload(0x40)

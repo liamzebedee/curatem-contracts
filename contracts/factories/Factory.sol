@@ -2,19 +2,24 @@ import "../vendor/CloneFactory.sol";
 import "../vendor/Initializable.sol";
 import "../tokens/OutcomeToken.sol";
 import "../market/SpamPredictionMarket.sol";
+import "../CuratemCommunity.sol";
 
 contract Factory is Initializable, CloneFactory {
     address public outcomeToken;
     address public spamPredictionMarket;
+    address public curatemCommunity;
 
     constructor() public {}
     
-    function initialize()
+    function initialize(
+        address _curatemCommunity
+    )
         public 
         uninitialized
     {
         outcomeToken = address(new OutcomeToken());
         spamPredictionMarket = address(new SpamPredictionMarket());
+        curatemCommunity = _curatemCommunity;
     }
 
     function newOutcomeToken(
@@ -51,11 +56,24 @@ contract Factory is Initializable, CloneFactory {
         return clone;
     }
 
-    // function newModeratorArbitrator(
-    // )
-    //     external
-    //     returns (address)
-    // {
-
-    // }
+    function newCommunity(
+        address _realitio,
+        address _uniswapFactory,
+        address _factory,
+        address _token,
+        address payable _moderatorArbitrator
+    )
+        external
+        returns (address)
+    {
+        address clone = createClone(curatemCommunity);
+        CuratemCommunity(clone).initialize(
+            _realitio,
+            _uniswapFactory,
+            _factory,
+            _token,
+            _moderatorArbitrator
+        );
+        return clone;
+    }
 }

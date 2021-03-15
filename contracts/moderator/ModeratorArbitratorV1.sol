@@ -35,6 +35,7 @@ contract ModeratorArbitratorV1 is Initializable, IArbitrator, Proxyable {
     ) 
         public 
         uninitialized 
+        onlyOwner
     {
         _realitio = IRealitio(_realityio);
         _metadata = _metadata;

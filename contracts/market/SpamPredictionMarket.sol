@@ -17,7 +17,6 @@ interface IFlashLoanReceiver {
 
 contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMixin {
     uint constant MAX_UINT = 2**256 - 1;
-    uint constant UNISWAP_MINIMUM_LIQUIDITY = 1000;
 
     enum MARKET_STATUS {
         INITIALIZING,
@@ -26,7 +25,6 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     }
 
     event Initialized();
-    event PoolCreated(address pool);
     event SharesBought(address user, uint amount);
     event SharesSold(address user, uint amount);
     event Finalized();
@@ -90,15 +88,6 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
 
         marketState = uint8(MARKET_STATUS.OPEN);
         emit Initialized();
-    }
-
-    function createPool(
-        uint256[3] calldata amounts
-    ) 
-        external
-        isOpen
-        returns (address)
-    {
     }
 
     function buy(uint256 amount) 

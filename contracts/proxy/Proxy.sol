@@ -59,9 +59,7 @@ contract Proxy is Owned {
 
     fallback() external payable {
         // Mutable call setting Proxyable.messageSender as this is using call not delegatecall
-        console.log("target=%s msg.sender=%s", address(target), msg.sender);
         target.setMessageSender(msg.sender);
-        console.log("delegatecall start");
 
         assembly {
             let free_ptr := mload(0x40)

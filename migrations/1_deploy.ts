@@ -101,20 +101,29 @@ async function main() {
     const scripts = await Scripts.deploy()
     contracts['Scripts'] = scripts
 
+    const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
+    const curatemCommunity = await CuratemCommunity.deploy()
     const Factory = await hre.ethers.getContractFactory('Factory', { libraries })
     const factory = await Factory.deploy()
-    await factory.initialize()
+    await factory.initialize(curatemCommunity.address)
     contracts['Factory'] = factory
 
     //
     // Deploy: Curatem.
     //
-
-    const Curatem = await hre.ethers.getContractFactory('Curatem', {
+    const Curatem = await hre.ethers.getContractFactory('Curatem')
+    const curatem = await Curatem.deploy()
+    const CuratemV1 = await hre.ethers.getContractFactory('CuratemV1', {
         libraries,
     })
-
-    const curatem = await Curatem.deploy(Realitio, RealitioProxy)
+    const curatemV1 = await CuratemV1.deploy(
+        curatem.address,
+        Realitio,
+        UniswapV2Factory,
+        factory.address
+    )
+    await curatem.setTarget(curatemV1.address)
+    contracts['CuratemV1'] = curatemV1
     contracts['Curatem'] = curatem
 
     //
@@ -135,12 +144,9 @@ async function main() {
 
         const salt = ethers.BigNumber.from(ethers.utils.randomBytes(32))
 
-        const res = await curatem.createCommunity(
-            salt,
-            UniswapV2Factory,
-            factory.address,
+        const res = await curatemV1.createCommunity(
             community.token,
-            community.moderator,
+            community.moderator
         )
         const receipt = await res.wait()
         const event = receipt.events.find((log) => log.event === 'NewCommunity')

@@ -1,6 +1,13 @@
 spam-contracts
 ==============
 
+ * Hardhat.
+ * Ethers.
+ * TypeScript.
+ * TypeChain.
+ * Chai.
+ * Waffle.
+
 ## Run.
 
 ```sh

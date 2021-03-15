@@ -8,58 +8,41 @@ import "./market/SpamPredictionMarket.sol";
 import "./moderator/ModeratorArbitrator.sol";
 import "hardhat/console.sol";
 import "./proxy/Proxyable.sol";
+import "./vendor/Owned.sol";
+import "./vendor/Initializable.sol";
 
-
-interface IFPMMDeterministicFactory {
-    function create2FixedProductMarketMaker(
-     uint saltNonce,
-     address conditionalTokens,
-     address collateralToken,
-     bytes32[] calldata conditionIds,
-     uint fee,
-     uint initialFunds,
-     uint[] calldata distributionHint
-  ) external returns (address);
-}
-
-contract CuratemCommunity {
+contract CuratemCommunity is Initializable {
     IERC20 public token;
+    IRealitio public realitio;
+    address public uniswapFactory;
+    Factory public factory;
     address payable public moderatorArbitrator;
+
+    uint32 public timeoutResolution = 5 minutes;
     mapping(bytes32 => string) public itemUrlForDigest;
 
-    event MarketCreated(bytes32 hashDigest, bytes32 conditionId, bytes32 questionId, address fixedProductMarketMaker);
-    event NewSpamPredictionMarket(bytes32 hashDigest, bytes32 questionId, address market);
-
-    IRealitio realitio;
-    // IConditionalTokens conditionalTokens;
-    // IFPMMDeterministicFactory fpmmFactory;
-    address realityIoGnosisProxy;
-    address uniswapFactory;
-    Factory factory;
-    uint32 timeoutResolution = 5 minutes;
-
-    uint256 constant SPAM_MARKET_OUTCOME_SLOT_COUNT = 2;
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
     uint256 constant MAX_UINT = 2**256 - 1;
+
+    event NewSpamPredictionMarket(bytes32 hashDigest, bytes32 questionId, address market);
 
     constructor(
     ) 
         public 
-    {   
+    {
     }
 
     function initialize(
         address _realitio,
-        address _realityIoGnosisProxy,
         address _uniswapFactory,
         address _factory,
         address _token,
         address payable _moderatorArbitrator
     )
         public
+        uninitialized
     {
         realitio = IRealitio(_realitio);
-        realityIoGnosisProxy = _realityIoGnosisProxy;
         factory = Factory(_factory);
         uniswapFactory = _uniswapFactory;
 
@@ -71,17 +54,17 @@ contract CuratemCommunity {
         );
     }
 
-    function setTimeout(uint32 _timeoutResolution) public {
-        timeoutResolution = _timeoutResolution;
-    }
+    // function setTimeout(uint32 _timeoutResolution) public {
+    //     timeoutResolution = _timeoutResolution;
+    // }
 
-    function setModeratorArbitrator(
-        address _moderatorArbitrator
-    )
-        public 
-    {
-        ModeratorArbitrator(moderatorArbitrator).setTarget(Proxyable(_moderatorArbitrator));
-    }
+    // function setModeratorArbitrator(
+    //     address _moderatorArbitrator
+    // )
+    //     public 
+    // {
+    //     ModeratorArbitrator(moderatorArbitrator).setTarget(Proxyable(_moderatorArbitrator));
+    // }
 
     function createMarket(
         string calldata url
@@ -98,7 +81,6 @@ contract CuratemCommunity {
         uint32 timeout; 
         uint32 opening_ts;
         uint256 nonce;
-        address oracle;
     }
 
     function createPredictionMarket(
@@ -118,8 +100,7 @@ contract CuratemCommunity {
             arbitrator: moderatorArbitrator,
             timeout: timeoutResolution,
             opening_ts: uint32(block.timestamp),
-            nonce: uint256(hashDigest),
-            oracle: realityIoGnosisProxy
+            nonce: uint256(hashDigest)
         });
 
         // Create the question for the post ID.
@@ -132,7 +113,7 @@ contract CuratemCommunity {
             questionId_vars.nonce);
         
         address market = factory.newSpamPredictionMarket(
-            questionId_vars.oracle,
+            address(realitio),
             address(token),
             uniswapFactory,
             address(factory),

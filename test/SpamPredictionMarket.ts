@@ -52,7 +52,9 @@ describe("SpamPredictionMarket", function () {
 		// Factory
 		const Factory = await hre.ethers.getContractFactory("Factory")
 		const factory = await Factory.deploy() as unknown as Factory
-		await factory.initialize()
+		await factory.initialize(
+			ethers.constants.AddressZero
+		)
 
 		// Etc
 		collateral = await deployNewERC20("Collateral", "REP", account)

@@ -1,41 +1,64 @@
 import "./CuratemCommunity.sol";
+import "./vendor/Owned.sol";
+import "./proxy/Proxyable.sol";
+import "./proxy/Proxy.sol";
 
 
-contract Curatem {
-    address realitio;
-    address realityIoGnosisProxy;
+contract Curatem is Proxy {
+    constructor()
+        public
+        Proxy(msg.sender)
+    {
+    }
+}
+
+contract CuratemV1 is Owned, Proxyable {
+    address public realitio;
+    address public uniswapFactory;
+    address public factory;
 
     event NewCommunity(address community);
+    bytes32 private constant NEW_COMMUNITY_SIG = keccak256("NewCommunity(address)");
 
     constructor(
+        address payable _proxy,
         address _realitio,
-        address _realityIoGnosisProxy
+        address _uniswapFactory,
+        address _factory
     ) 
         public 
+        Owned(msg.sender)
+        Proxyable(_proxy)
     {
         realitio = _realitio;
-        realityIoGnosisProxy = _realityIoGnosisProxy;
+        uniswapFactory = _uniswapFactory;
+        factory = _factory;
     }
 
     function createCommunity(
-        bytes32 salt,
-        address _uniswapFactory,
-        address _factory,
         address _token,
         address _moderatorArbitrator
-    ) public returns (address) {
-        CuratemCommunity community = new CuratemCommunity();
-        
-        community.initialize(
+    ) 
+        public 
+        returns (address) 
+    {
+        address community = Factory(factory).newCommunity(
             realitio,
-            realityIoGnosisProxy,
-            _uniswapFactory,
-            _factory,
+            uniswapFactory,
+            factory,
             _token, 
             payable(_moderatorArbitrator)
         );
         
-        emit NewCommunity(address(community));
+        proxy._emit(
+            abi.encode(address(community)),
+            1,
+            NEW_COMMUNITY_SIG,
+            0,
+            0,
+            0
+        );
+
         return address(community);
     }
 }
