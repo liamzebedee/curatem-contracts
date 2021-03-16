@@ -50,7 +50,6 @@ export default {
 
   networks: {
     hardhat: {
-
       chainId: 42,
       forking: {
         url: process.env.FORKING_URL,

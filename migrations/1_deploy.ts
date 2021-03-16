@@ -37,6 +37,7 @@ async function main() {
     let provider = hre.ethers.provider
     const signer = provider.getSigner()
     const account = await signer.getAddress()
+    console.log(`Account: ${account}`)
     let deployments = require(DEPLOYMENTS_PATH)
     
     const libraries: {
@@ -87,7 +88,6 @@ async function main() {
     const ModeratorArbitrator = await hre.ethers.getContractFactory('ModeratorArbitrator')
     const moderatorArbitrator = await ModeratorArbitrator.deploy()
     await saveDeployment('ModeratorArbitrator', moderatorArbitrator)
-    console.log(moderatorArbitrator.deployTransaction)
 
     const ModeratorArbitratorV1 = await hre.ethers.getContractFactory('ModeratorArbitratorV1')
     // TODO
@@ -98,7 +98,6 @@ async function main() {
     const moderatorArbitratorV1 = await ModeratorArbitratorV1.deploy(moderatorArbitrator.address)
     const moderatorMultisig = METAMASK_DEV_ACCOUNT
     await moderatorArbitratorV1.initialize(Realitio, JSON.stringify(metadata), moderatorMultisig)
-
     await moderatorArbitrator.setTarget(moderatorArbitratorV1.address)
 
     //
@@ -112,8 +111,17 @@ async function main() {
 
     const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
     const curatemCommunity = await CuratemCommunity.deploy()
+    await curatemCommunity.deployTransaction.wait(1)
+    await curatemCommunity.initialize(
+        Realitio,
+        ethers.constants.AddressZero,
+        ethers.constants.AddressZero,
+        ethers.constants.AddressZero,
+        moderatorArbitrator.address,
+    )
     const Factory = await hre.ethers.getContractFactory('Factory', { libraries })
     const factory = await Factory.deploy()
+    await factory.deployTransaction.wait(1)
     await factory.initialize(curatemCommunity.address)
     await saveDeployment('Factory', factory)
 
@@ -154,10 +162,7 @@ async function main() {
 
         const res = await curatemV1.createCommunity(
             community.token,
-            community.moderator,
-            { 
-                gasLimit: 194687
-            }
+            community.moderator
         )
         const receipt = await res.wait()
         const event = receipt.events.find((log) => log.event === 'NewCommunity')

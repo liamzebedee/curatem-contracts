@@ -18,8 +18,8 @@ contract CuratemCommunity is Initializable {
     Factory public factory;
     address payable public moderatorArbitrator;
 
-    uint32 public timeoutResolution = 5 minutes;
     mapping(bytes32 => string) public itemUrlForDigest;
+    uint32 public timeoutResolution = 5 minutes;
 
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
     uint256 constant MAX_UINT = 2**256 - 1;
@@ -29,6 +29,7 @@ contract CuratemCommunity is Initializable {
     constructor(
     ) 
         public 
+        Initializable()
     {
     }
 
@@ -48,10 +49,12 @@ contract CuratemCommunity is Initializable {
 
         token = IERC20(_token);
         moderatorArbitrator = _moderatorArbitrator;
+        timeoutResolution = 5 minutes;
         require(
             ModeratorArbitrator(moderatorArbitrator).impl().realitio() == realitio,
             "ERR_MODERATOR_ARBITRATOR_REALITIO"
         );
+
     }
 
     // function setTimeout(uint32 _timeoutResolution) public {

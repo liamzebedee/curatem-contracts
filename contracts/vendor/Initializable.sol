@@ -1,5 +1,7 @@
+pragma solidity ^0.6.6;
+
 contract Initializable {
-    bool _initialized = false;
+    bool private _initialized = false;
 
     modifier uninitialized() {
         require(_initialized == false, "ERR_ALREADY_INITIALIZED");
