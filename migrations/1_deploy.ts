@@ -24,6 +24,12 @@ async function saveDeployment(name: string, contract: ethers.Contract) {
     } as unknown as Contract
 }
 
+async function waitTx(call: Promise<ethers.providers.TransactionResponse>) {
+    const pending: ethers.providers.TransactionResponse = await call
+    const receipt = await pending.wait(1)
+    return receipt
+}
+
 async function main() {
     const {
         METAMASK_DEV_ACCOUNT
@@ -142,7 +148,10 @@ async function main() {
         factory.address
     )
     await saveDeployment('CuratemV1', factory)
-    await curatem.setTarget(curatemV1.address)
+    await waitTx(
+        curatem.setTarget(curatemV1.address)
+    )
+    
 
     //
     // Deploy an example community.
