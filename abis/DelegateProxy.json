@@ -1,6 +1,12 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -20,19 +26,6 @@
   {
     "stateMutability": "payable",
     "type": "fallback"
-  },
-  {
-    "inputs": [],
-    "name": "impl",
-    "outputs": [
-      {
-        "internalType": "contract IArbitrator",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],

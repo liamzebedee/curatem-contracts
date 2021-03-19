@@ -8,19 +8,19 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "bytes32",
         "name": "hashDigest",
         "type": "bytes32"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "bytes32",
         "name": "questionId",
         "type": "bytes32"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "market",
         "type": "address"
@@ -89,6 +89,11 @@
       },
       {
         "internalType": "address",
+        "name": "_realitioOracle",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_uniswapFactory",
         "type": "address"
       },
@@ -151,6 +156,19 @@
     "outputs": [
       {
         "internalType": "contract IRealitio",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "realitioOracle",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }

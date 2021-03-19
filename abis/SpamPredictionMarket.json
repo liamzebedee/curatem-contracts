@@ -20,7 +20,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -39,7 +39,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -58,7 +58,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
         "name": "user",
         "type": "address"
@@ -177,19 +177,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "_questionId",
-        "type": "bytes32"
-      }
-    ],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "notSpamToken",
     "outputs": [
@@ -287,13 +274,6 @@
       }
     ],
     "name": "reportPayouts",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "resolve",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

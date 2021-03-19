@@ -4,7 +4,7 @@ pragma solidity >=0.6.0;
 import "../vendor/Owned.sol";
 
 // Internal references
-import "./Proxy.sol";
+import "./CallProxy.sol";
 import "hardhat/console.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/proxyable
@@ -12,8 +12,8 @@ abstract contract Proxyable is Owned {
     // This contract should be treated like an abstract contract
 
     /* The proxy this contract exists behind. */
-    Proxy public proxy;
-    Proxy public integrationProxy;
+    CallProxy public proxy;
+    CallProxy public integrationProxy;
 
     /* The caller of the proxy, passed through to this contract.
      * Note that every function using this member must apply the onlyProxy or
@@ -24,30 +24,20 @@ abstract contract Proxyable is Owned {
         // This contract is abstract, and thus cannot be instantiated directly
         require(owner != address(0), "Owner must be set");
 
-        proxy = Proxy(_proxy);
+        proxy = CallProxy(_proxy);
         emit ProxyUpdated(_proxy);
     }
 
     function setProxy(address payable _proxy) external onlyOwner {
-        proxy = Proxy(_proxy);
+        proxy = CallProxy(_proxy);
         emit ProxyUpdated(_proxy);
     }
 
     function setIntegrationProxy(address payable _integrationProxy) external onlyOwner {
-        integrationProxy = Proxy(_integrationProxy);
+        integrationProxy = CallProxy(_integrationProxy);
     }
 
     function setMessageSender(address sender) external onlyProxy {
-        bytes32 slot;
-        assembly {
-            // sstore(messageSender_slot, sender)
-            slot := messageSender_slot
-        }
-        console.logUint(gasleft());
-        console.logBytes32(slot);
-        console.log("%s", sender);
-        // a=sender;
-        messageSender = address(23);
         messageSender = sender;
     }
 
@@ -57,7 +47,7 @@ abstract contract Proxyable is Owned {
     }
 
     function _onlyProxy() private view {
-        require(Proxy(msg.sender) == proxy || Proxy(msg.sender) == integrationProxy, "Only the proxy can call");
+        require(CallProxy(msg.sender) == proxy || CallProxy(msg.sender) == integrationProxy, "Only the proxy can call");
     }
 
     modifier optionalProxy {
@@ -66,7 +56,7 @@ abstract contract Proxyable is Owned {
     }
 
     function _optionalProxy() private {
-        if (Proxy(msg.sender) != proxy && Proxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
+        if (CallProxy(msg.sender) != proxy && CallProxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
             messageSender = msg.sender;
         }
     }
@@ -78,7 +68,7 @@ abstract contract Proxyable is Owned {
 
     // solhint-disable-next-line func-name-mixedcase
     function _optionalProxy_onlyOwner() private {
-        if (Proxy(msg.sender) != proxy && Proxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
+        if (CallProxy(msg.sender) != proxy && CallProxy(msg.sender) != integrationProxy && messageSender != msg.sender) {
             messageSender = msg.sender;
         }
         require(messageSender == owner, "Owner only function");

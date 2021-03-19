@@ -102,9 +102,19 @@ async function main() {
         template_hashes: [],
     }
     const moderatorArbitratorV1 = await ModeratorArbitratorV1.deploy(moderatorArbitrator.address)
+    await waitTx(
+        moderatorArbitrator.proxy_setTarget(moderatorArbitratorV1.address)
+    )
+
+    const moderatorArbitratorBound = await hre.ethers.getContractAt('ModeratorArbitratorV1', moderatorArbitrator.address)
     const moderatorMultisig = METAMASK_DEV_ACCOUNT
-    await moderatorArbitratorV1.initialize(Realitio, JSON.stringify(metadata), moderatorMultisig)
-    await moderatorArbitrator.setTarget(moderatorArbitratorV1.address)
+    await waitTx(
+        moderatorArbitratorBound.initialize(
+            Realitio, 
+            JSON.stringify(metadata), 
+            moderatorMultisig
+        )
+    )
 
     //
     // Deploy: Scripts, Factory.
@@ -118,19 +128,32 @@ async function main() {
     const CuratemCommunity = await hre.ethers.getContractFactory("CuratemCommunity")
     const curatemCommunity = await CuratemCommunity.deploy()
     await curatemCommunity.deployTransaction.wait(1)
-    await curatemCommunity.initialize(
-        Realitio,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        moderatorArbitrator.address,
+    await waitTx(
+        curatemCommunity.initialize(
+            Realitio,
+            ethers.constants.AddressZero,
+            ethers.constants.AddressZero,
+            ethers.constants.AddressZero,
+            ethers.constants.AddressZero,
+            moderatorArbitrator.address,
+        )
     )
     const Factory = await hre.ethers.getContractFactory('Factory', { libraries })
     const factory = await Factory.deploy()
     await factory.deployTransaction.wait(1)
-    await factory.initialize(curatemCommunity.address)
+    await waitTx(
+        await factory.initialize(curatemCommunity.address)
+    )
     await saveDeployment('Factory', factory)
 
+    // 
+    // Deploy: RealitioOracle
+    // 
+    console.log(`Deploy: RealitioOracle`)
+    const RealitioOracle = await hre.ethers.getContractFactory('RealitioOracle')
+    const realitioOracle = await RealitioOracle.deploy(Realitio)
+    await saveDeployment('RealitioOracle', realitioOracle)
+    
     //
     // Deploy: Curatem.
     //
@@ -144,6 +167,7 @@ async function main() {
     const curatemV1 = await CuratemV1.deploy(
         curatem.address,
         Realitio,
+        realitioOracle.address,
         UniswapV2Factory,
         factory.address
     )
@@ -151,7 +175,7 @@ async function main() {
     await waitTx(
         curatem.setTarget(curatemV1.address)
     )
-    
+
 
     //
     // Deploy an example community.

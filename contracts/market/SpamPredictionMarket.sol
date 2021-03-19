@@ -9,13 +9,12 @@ import "../interfaces/IOutcomeToken.sol";
 import "../interfaces/ISpamPredictionMarket.sol";
 import "../tokens/OutcomeToken.sol";
 import "../factories/Factory.sol";
-import "./RealitioOracleResolverMixin.sol";
 
 interface IFlashLoanReceiver {
     function onFlashLoan(uint256 amount) external;
 }
 
-contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMixin {
+contract SpamPredictionMarket is ISpamPredictionMarket {
     uint constant MAX_UINT = 2**256 - 1;
 
     enum MARKET_STATUS {
@@ -25,10 +24,10 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
     }
 
     event Initialized();
-    event SharesBought(address user, uint amount);
-    event SharesSold(address user, uint amount);
+    event SharesBought(address indexed user, uint amount);
+    event SharesSold(address indexed user, uint amount);
     event Finalized();
-    event SharesRedeemed(address user, uint amount);
+    event SharesRedeemed(address indexed user, uint amount);
     
     IUniswapV2Factory public uniswapFactory;
     Factory factory;
@@ -56,6 +55,11 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
         _;
     }
 
+    modifier onlyOracle() {
+        require(msg.sender == address(oracle), "ERR_ONLY_ORACLE");
+        _;
+    }
+
     constructor() 
         public
     {
@@ -71,8 +75,6 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
         public 
         isInitializing 
     {
-        RealitioOracleResolverMixin.initialize(_questionId);
-
         oracle = _oracle;
         collateralToken = IERC20(_collateralToken);
         uniswapFactory = IUniswapV2Factory(_uniswapFactory);
@@ -154,9 +156,9 @@ contract SpamPredictionMarket is ISpamPredictionMarket, RealitioOracleResolverMi
         external 
         override
         isOpen 
+        onlyOracle
     {
         // the oracle is responsible for implementing the market timeout.
-        require(msg.sender == address(oracle), "ERR_ONLY_ORACLE");
         require(_payouts.length == outcomeTokens.length, "payouts must be specified for all outcomes");
         
         uint sum = 0;

@@ -11,7 +11,7 @@ import "hardhat/console.sol";
 
 
 // https://docs.synthetix.io/contracts/source/contracts/proxy
-contract Proxy is Owned {
+contract CallProxy is Owned {
     Proxyable public target;
 
     constructor(address _owner) public Owned(_owner) {}
@@ -65,7 +65,7 @@ contract Proxy is Owned {
             let free_ptr := mload(0x40)
             calldatacopy(free_ptr, 0, calldatasize())
 
-            /* We must explicitly forward ether to the underlying contxract as well. */
+            /* We must explicitly forward ether to the underlying contract as well. */
             let result := call(gas(), sload(target_slot), callvalue(), free_ptr, calldatasize(), 0, 0)
             returndatacopy(free_ptr, 0, returndatasize())
 
@@ -75,6 +75,13 @@ contract Proxy is Owned {
             return(free_ptr, returndatasize())
         }
     }
+
+    // function externalCall(
+    //     address _contract,
+    //     bytes calldata _data
+    // ) onlyTarget returns (bytes memory) {
+    //     return _contract.call(_data);
+    // }
 
     receive() external payable {
         revert("BAD");

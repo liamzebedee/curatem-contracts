@@ -31,7 +31,7 @@ abstract class ContractResolver {
     }
   }
   
-  class DeploymentsJsonResolver {
+  export class DeploymentsJsonResolver {
     deployments: any
     networkId: number
   
@@ -74,10 +74,8 @@ abstract class ContractResolver {
     let networkId: number
     let network = await provider.getNetwork()
     networkId = network.chainId
-    // console.log(networkId)
+    console.log(`Resolving for network ID ${networkId}`)
   
-    
-
     let resolvedContracts
     
     const omenContracts = [

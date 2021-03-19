@@ -1,5 +1,6 @@
 pragma solidity >=0.6.0;
 import "../interfaces/IArbitrator.sol";
+import "../interfaces/IRealitio.sol";
 import "../vendor/Initializable.sol";
 import "../proxy/Proxyable.sol";
 import "../vendor/Owned.sol";
@@ -8,7 +9,7 @@ import "../vendor/Owned.sol";
 // - getDisputeFee
 // - requestArbitration
 // https://reality.eth.link/app/docs/html/arbitrators.html#creating-and-using-an-arbitration-contract
-contract ModeratorArbitratorV1 is Initializable, IArbitrator, Proxyable {
+contract ModeratorArbitratorV1 is Initializable, IArbitrator {
     // Minimum required by reality.eth.
     uint256 constant ARBITRATION_FEE = 1;
     uint256 constant MAX_UINT = 2**256 - 1;
@@ -18,14 +19,12 @@ contract ModeratorArbitratorV1 is Initializable, IArbitrator, Proxyable {
     address public moderator;
 
     modifier onlyModerator() {
-        require(messageSender == moderator, "ERR_ONLY_MODERATOR");
+        require(msg.sender == moderator, "ERR_ONLY_MODERATOR");
         _;
     }
 
     constructor(address _proxy) 
         public 
-        Owned(msg.sender)
-        Proxyable(payable(_proxy))
     {}
 
     function initialize(
@@ -35,7 +34,6 @@ contract ModeratorArbitratorV1 is Initializable, IArbitrator, Proxyable {
     ) 
         public 
         uninitialized 
-        onlyOwner
     {
         _realitio = IRealitio(_realityio);
         _metadata = _metadata;
@@ -56,24 +54,27 @@ contract ModeratorArbitratorV1 is Initializable, IArbitrator, Proxyable {
         external
         payable
         override
-        optionalProxy
         isInitialized
         returns (bool)
     {
         // Passing `MAX_UINT` prevents frontrunning using submitAnswer(max_previous + 1).
-        _realitio.notifyOfArbitrationRequest(question_id, messageSender, MAX_UINT);
+        _realitio.notifyOfArbitrationRequest(question_id, msg.sender, MAX_UINT);
         return true;
     }
 
     function submitAnswer(bytes32 question_id, bytes32 answer) 
         external
-        optionalProxy
         onlyModerator
         isInitialized
     {
         // answerer is the account credited with this answer for the purpose of bond claims.
         // Since the dispute fee is 0, we set the answerer to this multisig contract.
-        _realitio.submitAnswerByArbitrator(question_id, answer, address(proxy));
+        // proxy.externalCall(
+        //     _realitio,
+        //     _realitio.submitAnswerByArbitrator.selector,
+        //     abi.encodePacked(question_id, answer, address(proxy))
+        // );
+        _realitio.submitAnswerByArbitrator(question_id, answer, address(this));
     }
 
     function metadata () external override view returns (string memory) {

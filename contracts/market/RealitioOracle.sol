@@ -1,38 +1,19 @@
 import "../interfaces/IRealitio.sol";
 import "../interfaces/ISpamPredictionMarket.sol";
 
-
-/**
- * Mixin which adds a resolve() function to SpamPredictionMarket,
- * which calls out to the Realitio service and finalizes the
- * reported answer.
- */
-contract RealitioOracleResolverMixin {
+contract RealitioOracle {
     uint256 constant REALITIO_UNANSWERED = 0;
     uint256 constant CURATEM_NUM_OUTCOMES = 2;
-    bytes32 questionId;
+    IRealitio public realitio;
 
-    constructor() public {}
-
-    function initialize(bytes32 _questionId) public {
-        questionId = _questionId;
+    constructor(address _realitio) public {
+        realitio = IRealitio(_realitio);
     }
 
-    function resolve() external {
+    function resolve(bytes32 questionId, address market) external {
         uint256[] memory payouts;
         payouts = getSingleSelectPayouts(questionId, CURATEM_NUM_OUTCOMES);
-        market().reportPayouts(payouts);
-    }
-
-    /**
-     * Resolves to the market contract we're mixing into.
-     */
-    function market() internal view returns (ISpamPredictionMarket market) {
-        market = ISpamPredictionMarket(address(this));
-    }
-
-    function realitio() internal virtual returns (IRealitio realitio) {
-        realitio = IRealitio(market().oracle());
+        ISpamPredictionMarket(market).reportPayouts(payouts);
     }
 
     function getSingleSelectPayouts(bytes32 questionId, uint256 numOutcomes) 
@@ -40,7 +21,7 @@ contract RealitioOracleResolverMixin {
         returns (uint256[] memory) 
     {
         uint256[] memory payouts = new uint256[](numOutcomes);
-        uint256 answer = uint256(realitio().resultFor(questionId));
+        uint256 answer = uint256(realitio.resultFor(questionId));
 
         if(answer < numOutcomes) {
             payouts[answer] = 1;

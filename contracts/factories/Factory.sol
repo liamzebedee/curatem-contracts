@@ -58,6 +58,7 @@ contract Factory is Initializable, CloneFactory {
 
     function newCommunity(
         address _realitio,
+        address _realitioOracle,
         address _uniswapFactory,
         address _factory,
         address _token,
@@ -69,6 +70,7 @@ contract Factory is Initializable, CloneFactory {
         address clone = createClone(curatemCommunity);
         CuratemCommunity(clone).initialize(
             _realitio,
+            _realitioOracle,
             _uniswapFactory,
             _factory,
             _token,

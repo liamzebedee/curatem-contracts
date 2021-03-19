@@ -13,6 +13,11 @@
       },
       {
         "internalType": "address",
+        "name": "_realitioOracle",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_uniswapFactory",
         "type": "address"
       },
@@ -132,7 +137,7 @@
     "name": "integrationProxy",
     "outputs": [
       {
-        "internalType": "contract Proxy",
+        "internalType": "contract CallProxy",
         "name": "",
         "type": "address"
       }
@@ -197,7 +202,7 @@
     "name": "proxy",
     "outputs": [
       {
-        "internalType": "contract Proxy",
+        "internalType": "contract CallProxy",
         "name": "",
         "type": "address"
       }
@@ -208,6 +213,19 @@
   {
     "inputs": [],
     "name": "realitio",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "realitioOracle",
     "outputs": [
       {
         "internalType": "address",

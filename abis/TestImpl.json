@@ -67,7 +67,7 @@
     "name": "integrationProxy",
     "outputs": [
       {
-        "internalType": "contract Proxy",
+        "internalType": "contract CallProxy",
         "name": "",
         "type": "address"
       }
@@ -132,7 +132,7 @@
     "name": "proxy",
     "outputs": [
       {
-        "internalType": "contract Proxy",
+        "internalType": "contract CallProxy",
         "name": "",
         "type": "address"
       }

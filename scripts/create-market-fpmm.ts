@@ -166,31 +166,17 @@ async function main() {
   // const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
   // const moderatorArbitrator = await ModeratorArbitrator.deploy(REALITYIO_ADDRESS);
 
-  // const provider = new ethers.providers.JsonRpcProvider(ETH_RPC_URL)
+  const provider = new ethers.providers.JsonRpcProvider({
+    url: process.env.ETH_RPC_URL || 'http://localhost:8545'
+  })
   
   // const signers = await hre.ethers.getSigners()
   // const provider = await hre.ethers.provider
   // const signer = provider.getSigner()
   // const signer = new Wallet(ETH_ACCOUNT_PRIVKEY, provider)
   
-  const provider = new ethers.providers.JsonRpcProvider()
+  // const provider = new ethers.providers.JsonRpcProvider()
   const signer = provider.getSigner()
-
-  const {
-    Realitio: REALITYIO_ADDRESS,
-    RealitioProxy: REALITYIO_GNOSIS_PROXY_ADDRESS,
-    ConditionalTokens: CONDITIONAL_TOKENS_ADDRESS,
-    FPMMDeterministicFactory: FP_MARKET_MAKER_FACTORY_ADDRESS,
-    WETH9,
-    RedditCommunity1: RedditCommunity1
-  } = await resolveContracts(provider)
-  
-  console.log(  ETH_RPC_URL,
-    ETH_ACCOUNT_PRIVKEY,
-    REALITYIO_ADDRESS,
-    REALITYIO_GNOSIS_PROXY_ADDRESS,
-    CONDITIONAL_TOKENS_ADDRESS)
-
 
   // const ModeratorArbitrator = await hre.ethers.getContractFactory("ModeratorArbitrator");
   // // TODO
@@ -234,7 +220,6 @@ async function main() {
   const communityAddress = resolver.resolve('RedditCommunity1').address
   const community = await hre.ethers.getContractAt('CuratemCommunity', communityAddress)
   const createMarketTx = await community.createMarket(marketMetadata.url)
-  console.info(`Created market on Curatem`)
 
 
 
@@ -243,19 +228,28 @@ async function main() {
   // -----------
 
 
-  const receipt = await createMarketTx.wait()
-  const { hashDigest, questionId, market } = receipt.events.filter(event => event.event == 'NewSpamPredictionMarket')[0].args
+  const receipt = await createMarketTx.wait(1)
+  console.info(`Created market on Curatem`)
+  console.log(createMarketTx, receipt, receipt.events)
+  const { market } = receipt.events.filter(event => event.event == 'NewSpamPredictionMarket')[0].args
 
-  const scripts = await hre.ethers.getContractAt("Scripts", resolver.resolve('Scripts').address)
+  // const scripts = await hre.ethers.getContractAt("Scripts", resolver.resolve('Scripts').address)
   const predictionMarket = await hre.ethers.getContractAt("SpamPredictionMarket", market)
   
-  const weth = await hre.ethers.getContractAt('WETH9', WETH9)
-  await weth.approve(scripts.address, ethers.constants.MaxUint256)
-  await weth.deposit({ 
-    value: toWei('2')
-  })
+  // const weth = await hre.ethers.getContractAt('WETH9', WETH9)
+  // await weth.approve(scripts.address, ethers.constants.MaxUint256)
+  // await weth.deposit({ 
+  //   value: toWei('2')
+  // })
 
-
+  // const moderatorArbitrator = await hre.ethers.getContractAt(
+  //   "ModeratorArbitratorV1",
+  //   await community.moderatorArbitrator(),
+  // )
+  // console.log(moderatorArbitrator.address)
+  // const questionId = await predictionMarket.questionId()
+  // console.log(questionId, '0')
+  // await moderatorArbitrator.requestArbitration(questionId, '0')
 
 
   // await scripts.buyAndCreatePool(market, toWei('2'), toWei('2'))

@@ -1,19 +1,20 @@
 import "./CuratemCommunity.sol";
 import "./vendor/Owned.sol";
 import "./proxy/Proxyable.sol";
-import "./proxy/Proxy.sol";
+import "./proxy/CallProxy.sol";
 
 
-contract Curatem is Proxy {
+contract Curatem is CallProxy {
     constructor()
         public
-        Proxy(msg.sender)
+        CallProxy(msg.sender)
     {
     }
 }
 
 contract CuratemV1 is Owned, Proxyable {
     address public realitio;
+    address public realitioOracle;
     address public uniswapFactory;
     address public factory;
 
@@ -23,6 +24,7 @@ contract CuratemV1 is Owned, Proxyable {
     constructor(
         address payable _proxy,
         address _realitio,
+        address _realitioOracle,
         address _uniswapFactory,
         address _factory
     ) 
@@ -31,6 +33,7 @@ contract CuratemV1 is Owned, Proxyable {
         Proxyable(_proxy)
     {
         realitio = _realitio;
+        realitioOracle = _realitioOracle;
         uniswapFactory = _uniswapFactory;
         factory = _factory;
     }
@@ -44,6 +47,7 @@ contract CuratemV1 is Owned, Proxyable {
     {
         address community = Factory(factory).newCommunity(
             realitio,
+            realitioOracle,
             uniswapFactory,
             factory,
             _token, 

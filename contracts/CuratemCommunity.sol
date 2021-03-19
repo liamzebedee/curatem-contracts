@@ -14,6 +14,7 @@ import "./vendor/Initializable.sol";
 contract CuratemCommunity is Initializable {
     IERC20 public token;
     IRealitio public realitio;
+    address public realitioOracle;
     address public uniswapFactory;
     Factory public factory;
     address payable public moderatorArbitrator;
@@ -24,7 +25,7 @@ contract CuratemCommunity is Initializable {
     string constant REALITIO_UNICODE_SEPERATOR = "\u241F";
     uint256 constant MAX_UINT = 2**256 - 1;
 
-    event NewSpamPredictionMarket(bytes32 hashDigest, bytes32 questionId, address market);
+    event NewSpamPredictionMarket(bytes32 indexed hashDigest, bytes32 indexed questionId, address indexed market);
 
     constructor(
     ) 
@@ -35,6 +36,7 @@ contract CuratemCommunity is Initializable {
 
     function initialize(
         address _realitio,
+        address _realitioOracle,
         address _uniswapFactory,
         address _factory,
         address _token,
@@ -44,6 +46,7 @@ contract CuratemCommunity is Initializable {
         uninitialized
     {
         realitio = IRealitio(_realitio);
+        realitioOracle = _realitioOracle;
         factory = Factory(_factory);
         uniswapFactory = _uniswapFactory;
 
@@ -116,7 +119,7 @@ contract CuratemCommunity is Initializable {
             questionId_vars.nonce);
         
         address market = factory.newSpamPredictionMarket(
-            address(realitio),
+            realitioOracle,
             address(token),
             uniswapFactory,
             address(factory),

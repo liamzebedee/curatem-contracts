@@ -1,9 +1,10 @@
-import { task } from "hardhat/config";
+
+import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-waffle";
 import 'hardhat-abi-exporter'
 import 'hardhat-contract-sizer'
-import "@nomiclabs/hardhat-waffle"
-import '@typechain/hardhat';
+import '@typechain/hardhat'
+import { task, HardhatUserConfig } from "hardhat/config";
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -18,18 +19,15 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
-const GAS_PRICE = 20e9; // 20 GWEI
-
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-export default {
+// const GAS_PRICE = 20e9; // 20 GWEI
+const config: HardhatUserConfig = {
   solidity: {
-    optimizer: {
-      enabled: true,
-      runs: 200
-    },
+    // settings: {
+    //   optimizer: {
+    //     enabled: true,
+    //     runs: 200
+    //   }
+    // },
 
     compilers: [
       {
@@ -58,9 +56,6 @@ export default {
     },
 
     development: {
-      // gas: 12e6,
-			// blockGasLimit: 12e6,
-      // gasPrice: GAS_PRICE,
       url: "http://localhost:8545",
     },
     
@@ -69,6 +64,7 @@ export default {
       accounts: [process.env.ETH_ACCOUNT_PRIVKEY]
     }
   },
+
   paths: {
     sources: "./contracts",
     tests: "./test",
@@ -85,3 +81,4 @@ export default {
   }
 };
 
+export default config

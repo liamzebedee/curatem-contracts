@@ -63,6 +63,11 @@
       },
       {
         "internalType": "address",
+        "name": "_realitioOracle",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
         "name": "_uniswapFactory",
         "type": "address"
       },

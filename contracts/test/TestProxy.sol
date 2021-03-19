@@ -1,10 +1,10 @@
 
 import "../proxy/Proxyable.sol";
-import "../proxy/Proxy.sol";
+import "../proxy/CallProxy.sol";
 import "hardhat/console.sol";
 
-contract TestProxy is Proxy {
-    constructor() Proxy(msg.sender) public {}
+contract TestProxy is CallProxy {
+    constructor() CallProxy(msg.sender) public {}
     
 }
 
